@@ -3,7 +3,3 @@ extends layout
 block content
   h1= title
   p Welcome to #{title}
-  form(action="/upload" method="post" enctype="multipart/formdata")
-    input(type="text" name="Title")
-    input(type="file" name="upload" multiple="multiple")
-    input(type="submit" value="Upload")
