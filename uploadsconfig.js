@@ -40,6 +40,7 @@ req.imgid = id;
 id++;
 }
 //todo: condense these two req.imagename into a single function that returns the trimmed fileid.
+req.newdir = newdir;
 req.imagename = Buffer.from(req.imgid.toString()).toString('base64'); 
 req.imagename = removebase64padding(req.imagename);   
 cb(null, req.newdir);
