@@ -3,6 +3,16 @@ var fs = require('fs');
 var path = require('path');
 
 var id = 10000;
+newdir = __dirname + "/uploads/";
+fs.mkdir(newdir, (err) => {
+if(err && err.code != "EEXIST"){console.log(err); throw err;}
+else if (err.code == "EEXIST"){
+console.log("Directory already created. Folder ready.");
+}
+else{
+console.log("Created upload directory successfully. No errors.");
+}
+}); 
 // this id is local to this file and is only for naming purposes, in production it will be saved and loaded on server start up ensuring every image has a unique id.
 
 function removebase64padding(fileid){
@@ -31,12 +41,7 @@ id++;
 }
 //todo: condense these two req.imagename into a single function that returns the trimmed fileid.
 req.imagename = Buffer.from(req.imgid.toString()).toString('base64'); 
-req.imagename = removebase64padding(req.imagename);
-req.newdir = __dirname + "/uploads/";
-/*fs.mkdir(req.newdir, (err) => {
-if(err && err.code != "EEXIST"){throw err;}
-cb(null, req.newdir);
-});*/    
+req.imagename = removebase64padding(req.imagename);   
 cb(null, req.newdir);
 },   
 filename: function(req, file, cb){ 
