@@ -1,0 +1,32 @@
+<div class="row">
+    
+<!-- Old form non-bootstrap
+<form action="/uploadnewimage" enctype="multipart/form-data" method="post">
+    
+Add a title: 
+<input name="title" type="text" />
+    <br><br>
+<input multiple="multiple" name="image" type="file" />
+    <br><br>
+<input type="submit" value="Upload" />
+
+</form>
+-->
+    
+<form action="/api/uploadnewimage" enctype="multipart/form-data" method="post">
+  <div class="form-group">
+    <label for="imagetitle">Title</label>
+    <input name="title" type="text" class="form-control" id="imagetitle" placeholder="Image Title (Optional)">
+  </div>
+  <div class="form-group">
+    <label for="imagefiles">Image Upload</label>
+    <input name="image" type="file" id="imagefiles" required>
+  </div>
+  <button type="submit" class="btn btn-default">Upload</button>
+</form>
+    
+</div>
+<!-- imgthumbnail is a seperate component used to style the individual preview boxes.-->
+<div class="margin-top flex-container-basic">
+    <imgthumbnail  class = "flex-child-imgthumb" *ngFor="let top10image of top10images" [image] = "top10image"></imgthumbnail> 
+</div>

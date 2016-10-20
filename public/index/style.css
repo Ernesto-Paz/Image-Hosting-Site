@@ -1,8 +1,22 @@
-body {
-  padding: 50px;
-  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+.margin-top{
+margin-top: 10px;
 }
 
-a {
-  color: #00B7FF;
+.flex-container-basic{
+display:flex;
+flex-direction: row;
+flex-wrap: wrap;
+justify-content: center;
+}
+
+.flex-child-imgthumb{
+flex-basis: 100px;
+margin-left:5px;
+margin-right: 5px;
+height: 100px;
+margin-bottom: 18px;
+}
+
+.fixed-size-img{
+height:100px !important;
 }

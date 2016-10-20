@@ -1,3 +1,9 @@
 Basic Functionality
     1. Users should be able to upload images and be redirected to a custom unique url for thier image.
     2. Users should be able to share this url in order to share the image with others.
+    
+Database Design
+
+1. There are three models Users, Images, and Albums.
+
+2. Users can have many images which they can view direct through thier account window. They can have many albums which they can view directly through thier album window. Albums need at least one image, every image needs to be in at least one album. The default album, which has the same id as the image does.
