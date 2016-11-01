@@ -29,7 +29,7 @@ public toggleModal(): void{
 onSubmit(){
     let form = this.uploadform.nativeElement;
     let imageform: FormData  = new FormData(form);
-    this.globalhttp.submitformloop(imageform, "/api/uploadnewimage");
+    this.globalhttp.submitform(imageform, "/api/uploadnewimage");
     //this.globalhttp.postsingleimage()
 }
     
