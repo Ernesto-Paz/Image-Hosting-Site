@@ -10,30 +10,28 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var platform_browser_1 = require('@angular/platform-browser');
-var router_1 = require('@angular/router');
+var forms_1 = require('@angular/forms');
 var http_1 = require('@angular/http');
-var basetemplate_component_1 = require("./basetemplate/basetemplate.component");
-var homepage_component_1 = require('./homepage/homepage.component');
+var app_component_1 = require("./app/app.component");
 var imgthumbnail_component_1 = require('./imgthumbnail/imgthumbnail.component');
-var soloimagepage_component_1 = require("./soloimagepage/soloimagepage.component");
 var http_service_1 = require('./services/http.service');
-var appRoutes = router_1.RouterModule.forRoot([
-    { path: '', component: homepage_component_1.HomepageComponent },
-    { path: ':id', component: soloimagepage_component_1.SoloImagePageComponent }
-]);
+var homepage_component_1 = require('./homepage/homepage.component');
+var soloimagepage_component_1 = require("./soloimagepage/soloimagepage.component");
+var imgsubmitform_component_1 = require("./imgsubmitform/imgsubmitform.component");
+var app_routing_module_1 = require("./app.routing.module");
 var AppModule = (function () {
     function AppModule() {
     }
     AppModule = __decorate([
         core_1.NgModule({
-            imports: [platform_browser_1.BrowserModule, http_1.HttpModule, appRoutes],
-            declarations: [homepage_component_1.HomepageComponent, imgthumbnail_component_1.ImgThumbnailComponent, basetemplate_component_1.BaseTemplateComponent, soloimagepage_component_1.SoloImagePageComponent],
+            imports: [platform_browser_1.BrowserModule, http_1.HttpModule, app_routing_module_1.AppRoutingModule, forms_1.FormsModule],
+            declarations: [homepage_component_1.HomepageComponent, imgthumbnail_component_1.ImgThumbnailComponent, app_component_1.AppComponent, soloimagepage_component_1.SoloImagePageComponent, imgsubmitform_component_1.ImgSubmitFormComponent],
             providers: [http_service_1.GlobalHttpService],
-            bootstrap: [basetemplate_component_1.BaseTemplateComponent]
+            bootstrap: [app_component_1.AppComponent]
         }), 
         __metadata('design:paramtypes', [])
     ], AppModule);
     return AppModule;
 }());
 exports.AppModule = AppModule;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXBwLm1vZHVsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImFwcC5tb2R1bGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUF1QixlQUFlLENBQUMsQ0FBQTtBQUN2QyxpQ0FBNEIsMkJBQTJCLENBQUMsQ0FBQTtBQUN4RCx1QkFBMkIsaUJBQWlCLENBQUMsQ0FBQTtBQUM3QyxxQkFBeUIsZUFBZSxDQUFDLENBQUE7QUFFekMsdUNBQXNDLHVDQUF1QyxDQUFDLENBQUE7QUFDOUUsbUNBQW1DLCtCQUErQixDQUFDLENBQUE7QUFDbkUsdUNBQXNDLHVDQUF1QyxDQUFDLENBQUE7QUFDOUUsd0NBQXVDLHlDQUF5QyxDQUFDLENBQUE7QUFDakYsNkJBQW1DLHlCQUF5QixDQUFDLENBQUE7QUFFN0QsSUFBTSxTQUFTLEdBQUcscUJBQVksQ0FBQyxPQUFPLENBQUM7SUFDbkMsRUFBRSxJQUFJLEVBQUUsRUFBRSxFQUFPLFNBQVMsRUFBRSxzQ0FBaUIsRUFBRTtJQUMvQyxFQUFFLElBQUksRUFBRSxLQUFLLEVBQUUsU0FBUyxFQUFFLGdEQUFzQixFQUFFO0NBQ3JELENBQUMsQ0FBQztBQVNIO0lBQUE7SUFBeUIsQ0FBQztJQU4xQjtRQUFDLGVBQVEsQ0FBQztZQUNSLE9BQU8sRUFBRSxDQUFFLGdDQUFhLEVBQUUsaUJBQVUsRUFBRSxTQUFTLENBQUM7WUFDaEQsWUFBWSxFQUFFLENBQUUsc0NBQWlCLEVBQUUsOENBQXFCLEVBQUUsOENBQXFCLEVBQUUsZ0RBQXNCLENBQUM7WUFDeEcsU0FBUyxFQUFFLENBQUMsZ0NBQWlCLENBQUM7WUFDOUIsU0FBUyxFQUFFLENBQUUsOENBQXFCLENBQUU7U0FDckMsQ0FBQzs7aUJBQUE7SUFDdUIsZ0JBQUM7QUFBRCxDQUFDLEFBQTFCLElBQTBCO0FBQWIsaUJBQVMsWUFBSSxDQUFBIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXBwLm1vZHVsZS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImFwcC5tb2R1bGUudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUF1QixlQUFlLENBQUMsQ0FBQTtBQUN2QyxpQ0FBNEIsMkJBQTJCLENBQUMsQ0FBQTtBQUV4RCxzQkFBMEIsZ0JBQWdCLENBQUMsQ0FBQTtBQUMzQyxxQkFBeUIsZUFBZSxDQUFDLENBQUE7QUFFekMsOEJBQTZCLHFCQUFxQixDQUFDLENBQUE7QUFDbkQsdUNBQXNDLHVDQUF1QyxDQUFDLENBQUE7QUFDOUUsNkJBQW1DLHlCQUF5QixDQUFDLENBQUE7QUFDN0QsbUNBQW1DLCtCQUErQixDQUFDLENBQUE7QUFDbkUsd0NBQXVDLHlDQUF5QyxDQUFDLENBQUE7QUFDakYsd0NBQXVDLHlDQUF5QyxDQUFDLENBQUE7QUFFakYsbUNBQWlDLHNCQUFzQixDQUFDLENBQUE7QUFTeEQ7SUFBQTtJQUF5QixDQUFDO0lBTjFCO1FBQUMsZUFBUSxDQUFDO1lBQ1IsT0FBTyxFQUFFLENBQUUsZ0NBQWEsRUFBRSxpQkFBVSxFQUFFLHFDQUFnQixFQUFFLG1CQUFXLENBQUU7WUFDckUsWUFBWSxFQUFFLENBQUUsc0NBQWlCLEVBQUUsOENBQXFCLEVBQUUsNEJBQVksRUFBRSxnREFBc0IsRUFBRSxnREFBc0IsQ0FBRTtZQUN4SCxTQUFTLEVBQUUsQ0FBQyxnQ0FBaUIsQ0FBQztZQUM5QixTQUFTLEVBQUUsQ0FBRSw0QkFBWSxDQUFFO1NBQzVCLENBQUM7O2lCQUFBO0lBQ3VCLGdCQUFDO0FBQUQsQ0FBQyxBQUExQixJQUEwQjtBQUFiLGlCQUFTLFlBQUksQ0FBQSJ9

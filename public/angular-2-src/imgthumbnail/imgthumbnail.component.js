@@ -13,7 +13,7 @@ var ImgThumbnailComponent = (function () {
     function ImgThumbnailComponent() {
     }
     ImgThumbnailComponent.prototype.ngOnInit = function () {
-        this.image.url = "/getimage/" + this.image.fileid;
+        this.image.url = "/getimage/" + this.image.fileId;
     };
     __decorate([
         core_1.Input(), 

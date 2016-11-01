@@ -1,24 +1,23 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
+import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
 
-import { BaseTemplateComponent } from "./basetemplate/basetemplate.component";
-import { HomepageComponent }  from './homepage/homepage.component';
+import { AppComponent } from "./app/app.component";
 import { ImgThumbnailComponent } from './imgthumbnail/imgthumbnail.component';
-import { SoloImagePageComponent } from "./soloimagepage/soloimagepage.component";
 import { GlobalHttpService }  from './services/http.service';
+import { HomepageComponent }  from './homepage/homepage.component';
+import { SoloImagePageComponent } from "./soloimagepage/soloimagepage.component";
+import { ImgSubmitFormComponent } from "./imgsubmitform/imgsubmitform.component";
 
-const appRoutes = RouterModule.forRoot([
-    { path: '',      component: HomepageComponent },
-    { path: ':id', component: SoloImagePageComponent }
-]);
+import { AppRoutingModule } from "./app.routing.module";
 
 
 @NgModule({
-  imports: [ BrowserModule, HttpModule, appRoutes],
-  declarations: [ HomepageComponent, ImgThumbnailComponent, BaseTemplateComponent, SoloImagePageComponent],
+  imports: [ BrowserModule, HttpModule, AppRoutingModule, FormsModule ],
+  declarations: [ HomepageComponent, ImgThumbnailComponent, AppComponent, SoloImagePageComponent, ImgSubmitFormComponent ],
   providers: [GlobalHttpService],
-  bootstrap: [ BaseTemplateComponent ]
+  bootstrap: [ AppComponent ]
 })
 export class AppModule { }

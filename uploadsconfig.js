@@ -15,13 +15,13 @@ console.log("Created upload directory successfully. No errors.");
 }); 
 // this id is local to this file and is only for naming purposes, in production it will be saved and loaded on server start up ensuring every image has a unique id.
 
-function removebase64padding(fileid){
+function removebase64padding(fileId){
 var trimmedId;
-if(fileid.endsWith("=")){
-fileid = fileid.slice(0, -1)
-return removebase64padding(fileid);
+if(fileId.endsWith("=")){
+fileId = fileId.slice(0, -1)
+return removebase64padding(fileId);
 }else{
-trimmedId = fileid;
+trimmedId = fileId;
 return trimmedId;
 }
 }
@@ -39,7 +39,7 @@ console.log(id);
 req.imgid = id;
 id++;
 }
-//todo: condense these two req.imagename into a single function that returns the trimmed fileid.
+//todo: condense these two req.imagename into a single function that returns the trimmed fileId.
 req.newdir = newdir;
 req.imagename = Buffer.from(req.imgid.toString()).toString('base64'); 
 req.imagename = removebase64padding(req.imagename);   

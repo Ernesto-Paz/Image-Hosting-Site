@@ -31,16 +31,13 @@ app.use("/public", express.static(__dirname + "/public"));
 //Upload routes, will be moved to new router later
 //for uploads multer stores the folder in req.imagefolder, the full directory in req.newdir, the url is stored in req.imgurl. req.imgurl + req.filename = the full url for img src purposes. 
 app.post('/api/uploadnewimage', upload.single('image'), function (req, res) {
-    console.log(req.filename);
-    console.log("uploadpost");
     if (req.imgurl && req.filename) {
         db.image.create({
                 title: req.body.title,
-                fileid: req.imagename,
-                filedir: req.newdir + req.filename
+                fileId: req.imagename,
+                fileDir: req.newdir + req.filename
             })
             .then(function (todo) {
-                console.log("Database insert successful.");
             })
             .catch(function (err) {
                 console.log(err);
@@ -53,11 +50,10 @@ app.post('/api/uploadnewimage', upload.single('image'), function (req, res) {
 
 //returns an array of the last ten images.
 app.get("/api/last10images", function (req, res) {
-    console.log("Last10");
     db.image.findAll({
         limit: 10,
         attributes: {
-            exclude: ["filedir", "id"]
+            exclude: ["fileDir", "id"]
         }
 
 
@@ -76,18 +72,42 @@ app.get("/api/last10images", function (req, res) {
 
 });
 
+//returns most recent images in groups of 30, accepts 1 parameter for pagination
+
+app.get("/api/recentimages/:page", function (req, res) {
+if(req.params.page == "undefined"){
+req.params.page = 0;
+}
+console.log("Recent images " + req.params.page + ".");
+db.image.findAll({limit: 30, order:[["createdAt", "DESC"]], attributes:{exclude: ["fileDir", "id"]}, offset: req.params.page * 30 }).then(function (images) {
+        if (images) {
+            console.log(images.length);
+            res.json(images);
+        } else {
+            res.status(404).end();
+        }
+    }, function (err) {
+        console.log("Something went wrong with app.get /recentimages db retrieval.");
+        if (err) {
+            console.log(err);
+        }
+    });
+
+
+
+});
+
 //looks up the :imagename param in the database to see if it finds a corresponding image
 //then sends the image, does not send db record.
 //later, this will also check for proper authentication if needed. 
 app.get("/getimage/:imagename", function (req, res) {
     db.image.findOne({
         where: {
-            fileid: req.params.imagename
+            fileId: req.params.imagename
         }
     }).then(function (image) {
         if (image) {
-            console.log("Image Sent", req.params.imagename);
-            res.sendFile(image.filedir);
+            res.sendFile(image.fileDir);
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.imagename);
             error.name = "Error GET /api/:imagename | Image not Found";
@@ -105,10 +125,10 @@ app.get("/getimage/:imagename", function (req, res) {
 app.get("/api/:imagename", function (req, res) {
     db.image.findOne({
         where: {
-            fileid: req.params.imagename
+            fileId: req.params.imagename
         },
         attributes: {
-            exclude: ["filedir", "id"]
+            exclude: ["fileDir", "id"]
         }
 
     }).then(function (image) {
@@ -124,11 +144,7 @@ app.get("/api/:imagename", function (req, res) {
         console.log(err);
     });
 
-
-
-
 });
-
 
 
 app.get('/*', function (req, res) {
@@ -147,11 +163,9 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-db.sequelize.sync().then(function () {
+db.sequelize.sync({force:true}).then(function () {
     app.listen(function () {
         console.log("Listening on " + app.locals.port);
-
-
     });
 });
 

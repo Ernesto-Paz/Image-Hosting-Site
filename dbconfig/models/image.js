@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define("image", {
-        fileid:{
+        fileId:{
         type: DataTypes.STRING,
         allowNull: false
         },
@@ -8,7 +8,7 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.STRING,
             allowNull: false
         },
-        filedir : {
+        fileDir : {
             type:DataTypes.STRING, 
             allowNull: false
         }

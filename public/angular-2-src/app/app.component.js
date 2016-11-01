@@ -9,18 +9,18 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var core_1 = require("@angular/core");
-var BaseTemplateComponent = (function () {
-    function BaseTemplateComponent() {
+var AppComponent = (function () {
+    function AppComponent() {
     }
-    BaseTemplateComponent = __decorate([
+    AppComponent = __decorate([
         core_1.Component({
             moduleId: module.id,
             selector: "app",
-            templateUrl: "basetemplate.component.html"
+            templateUrl: "app.component.html"
         }), 
         __metadata('design:paramtypes', [])
-    ], BaseTemplateComponent);
-    return BaseTemplateComponent;
+    ], AppComponent);
+    return AppComponent;
 }());
-exports.BaseTemplateComponent = BaseTemplateComponent;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYmFzZXRlbXBsYXRlLmNvbXBvbmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImJhc2V0ZW1wbGF0ZS5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUEwQixlQUFlLENBQUMsQ0FBQTtBQVExQztJQUFBO0lBQW9DLENBQUM7SUFOakM7UUFBQyxnQkFBUyxDQUFFO1lBQ1IsUUFBUSxFQUFFLE1BQU0sQ0FBQyxFQUFFO1lBQ25CLFFBQVEsRUFBRSxLQUFLO1lBQ2YsV0FBVyxFQUFFLDZCQUE2QjtTQUN6QyxDQUFDOzs2QkFBQTtJQUUwQiw0QkFBQztBQUFELENBQUMsQUFBckMsSUFBcUM7QUFBeEIsNkJBQXFCLHdCQUFHLENBQUEifQ==
+exports.AppComponent = AppComponent;
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiYXBwLmNvbXBvbmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbImFwcC5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUEwQixlQUFlLENBQUMsQ0FBQTtBQVMxQztJQUFBO0lBQTJCLENBQUM7SUFOeEI7UUFBQyxnQkFBUyxDQUFFO1lBQ1IsUUFBUSxFQUFFLE1BQU0sQ0FBQyxFQUFFO1lBQ25CLFFBQVEsRUFBRSxLQUFLO1lBQ2YsV0FBVyxFQUFFLG9CQUFvQjtTQUNoQyxDQUFDOztvQkFBQTtJQUVpQixtQkFBQztBQUFELENBQUMsQUFBNUIsSUFBNEI7QUFBZixvQkFBWSxlQUFHLENBQUEifQ==

@@ -12,24 +12,24 @@ export class SoloImagePageComponent implements OnInit{
 constructor(private router: Router, private route: ActivatedRoute, private globalhttp: GlobalHttpService){
     
 }    
-public fileid: string = "";
+public fileId: string = "";
 public image: any;
 
 ngOnInit(){
     console.log(this.route.params);
 this.route.params.forEach((params: Params)=>{
-    this.fileid = params["id"];
-    console.log(this.fileid);
+    this.fileId = params["id"];
+    console.log(this.fileId);
     });
     this.getsingleimage();
 }
 
 private getsingleimage(){
 
-    this.globalhttp.getsingleimage(this.fileid).subscribe(
+    this.globalhttp.getsingleimage(this.fileId).subscribe(
         (res) => this.image = res ,
         (error) => console.log(error),
-() => {console.log("Done getting image info"); console.log(this.image); this.image.url = "/getimage/" + this.fileid; }
+() => {console.log("Done getting image info"); console.log(this.image); this.image.url = "/getimage/" + this.fileId; }
     );
 
 }    
