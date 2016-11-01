@@ -30,6 +30,7 @@ build/Release
 node_modules
 uploads/
 dbconfig/data/
+public/angular-2-src/**/*.js
 jspm_packages
 
 # Optional npm cache directory
