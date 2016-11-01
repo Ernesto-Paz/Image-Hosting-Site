@@ -14,7 +14,7 @@ var app = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-if (process.env.NODE_ENV == "development") {
+if (process.env.NODE_ENV == "development" || true ) {
 
     app.use("/node_modules", express.static(__dirname + '/node_modules'));
 
