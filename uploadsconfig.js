@@ -10,9 +10,10 @@ fs.mkdir(newdir, (err) => {
             console.log(err);
             throw err;
         }
-    } else if (err.code == "EEXIST") {
+        else if (err.code == "EEXIST") {
         console.log("Directory already created. Folder ready.");
-    } else {
+        } 
+    }else {
         console.log("Created upload directory successfully. No errors.");
     }
 });
