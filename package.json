@@ -10,7 +10,7 @@
     "typings": "typings install dt~core-js --save --global",
     "webpack": "webpack",
     "tsc": "tsc",
-    "start":"NODE_ENV=development node ./bin/www "
+    "start":"node ./bin/www "
   },
   "dependencies": {
     "@angular/common": "2.1.0",

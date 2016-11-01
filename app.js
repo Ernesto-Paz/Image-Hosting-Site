@@ -55,8 +55,6 @@ app.get("/api/last10images", function (req, res) {
         attributes: {
             exclude: ["fileDir", "id"]
         }
-
-
     }).then(function (images) {
         if (images) {
             res.json(images);
