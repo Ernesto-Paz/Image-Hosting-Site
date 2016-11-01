@@ -15,7 +15,7 @@ public modalopen: Boolean;
 @Output() onSubmitted = new EventEmitter();
 upload: any = {title:""};   
 constructor(private globalhttp: GlobalHttpService){
-this.modalopen = true;
+this.modalopen = false;
 }
 ngOnInit(){
     
