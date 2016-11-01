@@ -105,6 +105,7 @@ app.get("/getimage/:imagename", function (req, res) {
         }
     }).then(function (image) {
         if (image) {
+            console.log(image.fileDir);
             res.sendFile(image.fileDir);
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.imagename);
