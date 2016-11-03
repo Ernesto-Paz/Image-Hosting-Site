@@ -43,6 +43,10 @@ public submitform(form: FormData, url: string){
     xhr.setRequestHeader("enctype", "multipart/form-data");
 xhr.onreadystatechange = function(){
 if(xhr.readyState == 4 && xhr.status == 200){
+    console.log("Imagesubmit event");
+    Imagesubmit.emit();
+}else if(xhr.readyState == 4){
+    console.log("Imagesubmit event");
     Imagesubmit.emit();
 }
 

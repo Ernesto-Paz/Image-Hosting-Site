@@ -24,7 +24,7 @@ if((window.innerHeight + event.pageY) >= (document.body.scrollHeight - 50) && th
 };
     public recentimagesarray = [];
     public pageOffset: number;
-constructor(private globalhttp: GlobalHttpService){
+constructor(private globalhttp: GlobalHttpService ){
     //subscribe to ImageSubmit event in globalhttp
     globalhttp.onImageSubmit.subscribe(() => this.getImages(this.pageOffset));
     this.pageOffset = 0;

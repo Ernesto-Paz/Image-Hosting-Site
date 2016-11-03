@@ -11,22 +11,32 @@ import '../rjs-observables';
 
 export class ImgSubmitFormComponent implements OnInit{
 public modalopen: Boolean;
+public uploadingImage: Boolean;
 @ViewChild("uploadform") uploadform;
 @Output() onSubmitted = new EventEmitter();
 upload: any = {title:""};   
 constructor(private globalhttp: GlobalHttpService){
-this.modalopen = false;
+    globalhttp.onImageSubmit.subscribe(()=> {this.uploadingImage = false; this.toggleModal();}) 
+    this.modalopen = false;
+    this.uploadingImage = false;
 }
-ngOnInit(){
     
-}
+    
+ngOnInit(){}
+    
+    
 public toggleModal(): void{
-
-    this.modalopen = !this.modalopen;
+    
+    if(!this.uploadingImage){
+        
+        this.modalopen = !this.modalopen;
+        
+    }
 
 }
 
 onSubmit(){
+    this.uploadingImage = true;
     let form = this.uploadform.nativeElement;
     let imageform: FormData  = new FormData(form);
     this.globalhttp.submitform(imageform, "/api/uploadnewimage");
