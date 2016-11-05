@@ -1,6 +1,6 @@
 
-<div class="modalbackground" *ngIf="modalopen">
-    <div class="modalcontent">
+<div (click)="toggleModal();" class="modalbackground" *ngIf="modalopen">
+    <div class="modalcontent" (click)="$event.stopPropagation()">
     <i (click) = "toggleModal()" class="fa fa-2x fa-times modalclosebutton" aria-hidden="true"></i>
         <form action="/api/uploadnewimage" class="modalform" (ngSubmit)="onSubmit()" enctype="multipart/form-data" method="post" #uploadform>
           <div class="form-group">
