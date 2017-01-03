@@ -1,0 +1,7 @@
+1. Finish Implementing User Accounts.
+    a. Implement user Creation.
+    b. Implement user Login.
+    c. Implement user Logout.
+    d. Implement user specifc image uploads.
+        1. Implement user image permissions.
+        2. Implement user image deletion.

@@ -7,6 +7,7 @@ import { Observable }     from 'rxjs/Observable';
 export class GlobalHttpService {
     
   public onImageSubmit = new EventEmitter();
+    public onUserLogin = new EventEmitter();
 
     //private headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     //private options = new RequestOptions({ headers: this.headers });
@@ -36,50 +37,23 @@ public getsingleimage(imagename: string): Observable<any>{
     return this.http.get(imageurl).map(this.ResponseData);
 }
     
-public submitform(form: FormData, url: string){
+public submitform(form: FormData, url: string, method: string, requestheader: string, callback: Function){
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     let Imagesubmit = this.onImageSubmit;
-    xhr.open("POST", url, true);
+    xhr.open(method , url, true);
     xhr.setRequestHeader("enctype", "multipart/form-data");
 xhr.onreadystatechange = function(){
 if(xhr.readyState == 4 && xhr.status == 200){
     console.log("Imagesubmit event");
-    Imagesubmit.emit();
+    callback();
 }else if(xhr.readyState == 4){
     console.log("Imagesubmit event");
-    Imagesubmit.emit();
+    callback();
 }
 
 }
     xhr.send(form);
-}
-
-public submitformloop(form: FormData, url: string){
-    let Imagesubmit = this.onImageSubmit;
-function request(form, url) {
-    let xhr: XMLHttpRequest = new XMLHttpRequest();
-    //let Imagesubmit = this.onImageSubmit;
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader("enctype", "multipart/form-data");
-xhr.onreadystatechange = function(){
-if(xhr.readyState == 4 && xhr.status == 200){
-    //Imagesubmit.emit();
-}
-
-}
-    xhr.send(form);
-    
-}
-for(let i=0; i<1000; i++){
-
-    request(form, url);
-if(i == 999){
-Imagesubmit.emit();
-}
-}
-    
-
-}    
+} 
     
 public ResponseData(res: Response){
     console.log("ResponseData Function")

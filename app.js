@@ -5,10 +5,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var aws = require("aws-sdk");
+var gm = require("gm");
 var upload = require("./uploadsconfig.js").singleupload;
 var albumupload = require("./uploadsconfig.js").albumupload;
 var imageid = require("./uploadsconfig.js").imageid;
 var db = require("./dbconfig/db.js");
+
+var S3_BUCKET = process.env.S3_BUCKET || "development";
 var app = express();
 // view engine setup
 
@@ -23,28 +27,82 @@ app.use(logger('dev'));
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/", express.static(__dirname + "/public/index"));
 app.use("/public", express.static(__dirname + "/public"));
 
+
+//functions
+
+function objectHasProp (obj, prop){
+    
+return Object.prototype.hasOwnProperty.call(obj, prop);
+    
+}
+
+
+//Registers new user accounts.
+app.post("/users/registernewuser", upload.none(), function (req, res){
+    //cannot trust that hasOwnProperty will exist because object is submitted by user could allow for hasOwnProperty to be overwritten. Move hasOwnProperty to a seperate function.
+    if(objectHasProp(req.body, "username") && objectHasProp(req.body, "password")){
+        //process data to create a new user account. Send either success or failure back to front end.
+        db.user.create({
+            username: req.body.username,
+            password: req.body.password 
+        }).then(function(user){
+        res.send("Success");
+        
+        }, function(err){
+        console.log(err);
+        res.send("Failed");
+        
+        })
+        
+    }
+    
+    
+    
+})
+
+//Logs in user accounts.
+app.post("/users/login", upload.none(), function (req, res){
+   console.log(req.body);
+    if(objectHasProp(req.body, "username") && objectHasProp(req.body, "password")){
+        
+        //process credentials and return a session ID or handle rejection.
+        var body = {username: req.body.username, password: req.body.password};
+        db.user.authenticateUser(body).then(function(user){
+            res.send(user);
+        }, function(err){
+            res.send(err);
+            
+            
+        });
+        
+        
+    }
+})
+
+
 //Upload routes, will be moved to new router later
 //for uploads multer stores the folder in req.imagefolder, the full directory in req.newdir, the url is stored in req.imgurl. req.imgurl + req.filename = the full url for img src purposes. 
 app.post('/api/uploadnewimage', upload.single('image'), function (req, res) {
+    console.log(req.file);
     if (req.imgurl && req.filename) {
         db.image.create({
                 title: req.body.title,
                 fileId: req.imagename,
-                fileDir: req.newdir + req.filename
+                fileDir: req.file.path
             })
-            .then(function (todo) {
+            .then(function (image) {
             })
             .catch(function (err) {
                 console.log(err);
                 console.log(err.stack)
             });
     }
-    res.redirect('/');
 });
 
 
@@ -162,7 +220,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-db.sequelize.sync({force:true}).then(function () {
+db.sequelize.sync().then(function () {
     app.listen(function () {
         console.log("Listening on " + app.locals.port);
     });

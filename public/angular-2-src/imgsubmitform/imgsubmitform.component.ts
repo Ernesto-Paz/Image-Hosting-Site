@@ -26,7 +26,6 @@ this.onImageSubmitSubscription =  globalhttp.onImageSubmit.subscribe(()=> {this.
 ngOnInit(){}
 ngOnDestroy(){
     this.onImageSubmitSubscription.unsubscribe();
-
 } 
     
 public toggleModal(): void{
@@ -43,7 +42,7 @@ onSubmit(){
     this.uploadingImage = true;
     let form = this.uploadform.nativeElement;
     let imageform: FormData  = new FormData(form);
-    this.globalhttp.submitform(imageform, "/api/uploadnewimage");
+    this.globalhttp.submitform(imageform, "/api/uploadnewimage", "POST", ()=> {this.globalhttp.onImageSubmit.emit();});
     //this.globalhttp.postsingleimage()
 }
     

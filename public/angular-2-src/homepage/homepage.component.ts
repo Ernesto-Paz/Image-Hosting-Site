@@ -26,7 +26,8 @@ if((window.innerHeight + event.pageY) >= (document.body.scrollHeight - 50) && th
     public pageOffset: number;
 constructor(private globalhttp: GlobalHttpService ){
     //subscribe to ImageSubmit event in globalhttp
-    globalhttp.onImageSubmit.subscribe(() => this.getImages(this.pageOffset), (err) => console.log(err));
+    globalhttp.onImageSubmit.subscribe(() => this.getImages(this.pageOffset), 
+    (err) => console.log(err));
     this.pageOffset = 0;
 }
 

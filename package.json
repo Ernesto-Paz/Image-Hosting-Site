@@ -1,16 +1,16 @@
 {
   "name": "imagehostingsite",
   "version": "0.0.0",
-    "engines": {
-    "node":"6.7.0"
-    },
+  "engines": {
+    "node": "6.7.0"
+  },
   "private": true,
   "scripts": {
     "development": "NODE_ENV=development node ./bin/www",
     "typings": "typings install dt~core-js --save --global",
     "webpack": "webpack",
     "tsc": "tsc",
-    "start":"node ./bin/www "
+    "start": "node ./bin/www "
   },
   "dependencies": {
     "@angular/common": "2.1.0",
@@ -33,6 +33,7 @@
     "debug": "^2.2.0",
     "es6-shim": "^0.35.1",
     "express": "~4.13.4",
+    "gm": "^1.23.0",
     "jsonwebtoken": "^7.1.9",
     "morgan": "~1.7.0",
     "multer": "^1.2.0",
@@ -46,6 +47,7 @@
     "serve-favicon": "~2.3.0",
     "sqlite3": "^3.1.4",
     "systemjs": "^0.19.39",
+    "underscore": "^1.8.3",
     "zone.js": "^0.6.23"
   },
   "devDependencies": {
