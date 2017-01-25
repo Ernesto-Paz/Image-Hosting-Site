@@ -1,4 +1,13 @@
 var multer = require('multer');
+var multerS3 = require('multer-s3');
+var aws = require ('aws-sdk');
+aws.config.update({
+    secretAccessKey: "HTvluhfTTq06M7PBBynmWoUiCanNFf7oLzToF3eG",
+    accessKeyId: "AKIAJA2KDDP6FJPASJKA",
+    region: "us-east-1"
+});
+var s3 = new aws.S3();
+
 var fs = require('fs');
 var path = require('path');
 
@@ -34,8 +43,8 @@ function removebase64padding(fileId) {
 image id number. The URL plus the file extension gives us the file name of the uploaded file on the server. For
 example localhost:3000/newimage/newimage.jpg */
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+var storage = multerS3({
+   /* destination: function (req, file, cb) {
         console.log(req.body);
         console.log(file);
         if (file && req.body) {
@@ -48,11 +57,14 @@ var storage = multer.diskStorage({
         req.imagename = Buffer.from(req.imgid.toString()).toString('base64');
         req.imagename = removebase64padding(req.imagename);
         cb(null, req.newdir);
-    },
-    filename: function (req, file, cb) {
+    },*/
+    s3: s3,
+    bucket:"bucketofimageswithfries",
+    
+    //in converting to s3 this key function should return the key for the file in the bucket. Ideally usning Date.now() to avoid duplicates.
+    key: function (req, file, cb) {
         fileextension = path.extname(file.originalname);
-        req.filename = req.imagename + fileextension;
-        req.imgurl = "/uploads/" + req.filename;
+        req.filename = Date.now() + fileextension;
         cb(null, req.filename);
     }
 });
