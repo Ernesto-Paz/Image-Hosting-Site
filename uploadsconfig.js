@@ -1,11 +1,16 @@
 var multer = require('multer');
 var multerS3 = require('multer-s3');
 var aws = require ('aws-sdk');
+//configuring S3 for launch.
+var fs = require ('fs');
+var awsconfig = fs.readFileSync("awsconfig.json");
+awsconfig = JSON.parse(awsconfig);
 aws.config.update({
-    secretAccessKey: "HTvluhfTTq06M7PBBynmWoUiCanNFf7oLzToF3eG",
-    accessKeyId: "AKIAJA2KDDP6FJPASJKA",
-    region: "us-east-1"
+    secretAccessKey: awsconfig.secretAccessKey,
+    accessKeyId: awsconfig.accessKeyId,
+    region: awsconfig.region
 });
+
 var s3 = new aws.S3();
 
 var fs = require('fs');
