@@ -37,7 +37,7 @@ public getsingleimage(imagename: string): Observable<any>{
     return this.http.get(imageurl).map(this.ResponseData);
 }
     
-public submitform(form: FormData, url: string, method: string, requestheader: string, callback: Function){
+public submitform(form: FormData, url: string, method: string, callback: Function){
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     let Imagesubmit = this.onImageSubmit;
     xhr.open(method , url, true);
