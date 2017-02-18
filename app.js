@@ -249,7 +249,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-db.sequelize.sync({force:true}).then(function () {
+db.sequelize.sync().then(function () {
     app.listen(function () {
         console.log("Listening on " + app.locals.port);
     });
