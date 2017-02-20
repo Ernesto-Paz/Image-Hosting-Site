@@ -28,6 +28,7 @@ module.exports = function (sequelize, DataTypes) {
             adminLevel: {
                 type: DataTypes.STRING,
                 defaultValue: "StandardUser"
+                // StandardUser, ModeratorUser, AdminUser
             }
 
         },
@@ -51,7 +52,6 @@ module.exports = function (sequelize, DataTypes) {
                 authenticateUser: function (body) {
                     return new Promise(function (resolve, reject) {
                         console.log("Authenticating Login.");
-                        console.log("bleh");
                         var username = body.username.toLowerCase();
                         user.findOne({
                             where: {

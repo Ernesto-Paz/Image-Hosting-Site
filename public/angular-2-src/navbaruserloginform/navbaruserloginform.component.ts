@@ -18,8 +18,8 @@ constructor(private globalhttp: GlobalHttpService){
 onSubmit(){
     let form = this.navbaruserloginform.nativeElement;
     console.log(form);
-    let imageform: FormData  = new FormData(form);
-    this.globalhttp.submitform(imageform, "/users/registernewuser", "POST", ()=> {this.globalhttp.onImageSubmit.emit();});
+    let loginform: FormData  = new FormData(form);
+    this.globalhttp.submitform(loginform, "/users/registernewuser", "POST", ()=> {/*run login handler here */});
 }    
     
 }
