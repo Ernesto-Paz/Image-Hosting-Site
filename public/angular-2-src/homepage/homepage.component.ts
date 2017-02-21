@@ -50,7 +50,7 @@ private getImages(pageOffset: number){
         this.loadingnewpage = false;
         },
         (error) => console.log(error),
-() => {console.log("Done getting images.");}
+        () => {console.log("Done getting images.");}
         )
 }
     

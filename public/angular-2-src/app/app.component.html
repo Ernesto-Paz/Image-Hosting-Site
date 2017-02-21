@@ -15,11 +15,12 @@
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li (click)="imagesubmitmodal.toggleModal()"><a>Upload Image<span class="sr-only">(current)</span></a></li>
-        <li><a href="#">Link</a></li>
       </ul>
+            <ul class="nav navbar-nav navbar-right"><li (click)="userregistrationmodal.toggleModal()"><a>Register</a></li></ul>
             <navbaruserloginform></navbaruserloginform>
     </div><!-- /.navbar-collapse -->
 </nav>
     <imgsubmitform #imagesubmitmodal></imgsubmitform>
+    <userregistrationform #userregistrationmodal></userregistrationform>
 	<router-outlet></router-outlet>
 </div>

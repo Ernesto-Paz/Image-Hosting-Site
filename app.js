@@ -10,7 +10,7 @@ var gm = require("gm");
 var upload = require("./uploadsconfig.js").singleupload;
 var albumupload = require("./uploadsconfig.js").albumupload;
 var imageid = require("./uploadsconfig.js").imageid;
-var db = require("./dbconfig/db.js");
+var db = require("./models/index.js");
 
 var S3_BUCKET = "bucketofimageswithfries";
 var awsconfig = fs.readFileSync("awsconfig.json");
@@ -61,11 +61,13 @@ app.post("/users/registernewuser", upload.none(), function (req, res){
             username: req.body.username,
             password: req.body.password 
         }).then(function(user){
+        console.log(user);
+        res.cookie("Authorization", "I'm a cookie.");
         res.send("Success");
         
         }, function(err){
         console.log(err);
-        res.send("Failed");
+        res.send("Failed to create new user.");
         
         })
         

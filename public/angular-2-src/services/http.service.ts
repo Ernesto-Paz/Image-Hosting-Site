@@ -44,10 +44,10 @@ public submitform(form: FormData, url: string, method: string, callback: Functio
     xhr.setRequestHeader("enctype", "multipart/form-data");
 xhr.onreadystatechange = function(){
 if(xhr.readyState == 4 && xhr.status == 200){
-    console.log("Imagesubmit event");
+    console.log("Form Submission Callback");
     callback();
 }else if(xhr.readyState == 4){
-    console.log("Imagesubmit event");
+    console.log("Form Submission Callback");
     callback();
 }
 
