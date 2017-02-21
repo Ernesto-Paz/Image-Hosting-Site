@@ -13,6 +13,7 @@ var imageid = require("./uploadsconfig.js").imageid;
 var db = require("./models/index.js");
 
 var S3_BUCKET = "bucketofimageswithfries";
+if(env == "development"){
 var awsconfig = fs.readFileSync("awsconfig.json");
 awsconfig = JSON.parse(awsconfig);
 aws.config.update({
@@ -20,6 +21,15 @@ aws.config.update({
     accessKeyId: awsconfig.accessKeyId,
     region: awsconfig.region
 });
+}
+else{
+aws.config.update({
+    secretAccessKey: process.env.S3secretAccessKey,
+    accessKeyId: process.env.S3accessKeyId,
+    region: process.env.S3region
+});
+    
+}
 
 var s3 = new aws.S3();
 var app = express();

@@ -2,7 +2,7 @@
 logs
 *.log
 npm-debug.log*
-awsconfig.json
+/awsconfig.json
 
 # Runtime data
 pids
