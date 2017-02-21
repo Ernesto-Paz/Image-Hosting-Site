@@ -3,7 +3,8 @@ var multerS3 = require('multer-s3');
 var aws = require ('aws-sdk');
 //configuring S3 for launch.
 var fs = require ('fs');
-if(env == "development"){
+
+if(process.env.NODE_ENV !== "production"){
 var awsconfig = fs.readFileSync("awsconfig.json");
 awsconfig = JSON.parse(awsconfig);
 aws.config.update({

@@ -13,7 +13,7 @@ var imageid = require("./uploadsconfig.js").imageid;
 var db = require("./models/index.js");
 
 var S3_BUCKET = "bucketofimageswithfries";
-if(env == "development"){
+if(process.env.NODE_ENV !== "production"){
 var awsconfig = fs.readFileSync("awsconfig.json");
 awsconfig = JSON.parse(awsconfig);
 aws.config.update({
