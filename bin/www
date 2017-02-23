@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('Image-Hosting-Site:server');
 var http = require('http');
+//need to switch to https later for secure connections. Its not good to send user info over plain text.
+var https = require('https');
 
 /**
  * Get port from environment and store in Express.

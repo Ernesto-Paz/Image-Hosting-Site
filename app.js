@@ -1,4 +1,5 @@
 var express = require('express');
+var cookieSession = require('cookie-session');
 var path = require('path');
 var fs = require('fs');
 var favicon = require('serve-favicon');
@@ -7,28 +8,29 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var aws = require("aws-sdk");
 var gm = require("gm");
+var crypto = require("crypto");
 var upload = require("./uploadsconfig.js").singleupload;
 var albumupload = require("./uploadsconfig.js").albumupload;
 var imageid = require("./uploadsconfig.js").imageid;
+
 var db = require("./models/index.js");
 
 var S3_BUCKET = "bucketofimageswithfries";
-if(process.env.NODE_ENV !== "production"){
-var awsconfig = fs.readFileSync("awsconfig.json");
-awsconfig = JSON.parse(awsconfig);
-aws.config.update({
-    secretAccessKey: awsconfig.secretAccessKey,
-    accessKeyId: awsconfig.accessKeyId,
-    region: awsconfig.region
-});
-}
-else{
-aws.config.update({
-    secretAccessKey: process.env.S3secretAccessKey,
-    accessKeyId: process.env.S3accessKeyId,
-    region: process.env.S3region
-});
-    
+if (process.env.NODE_ENV !== "production") {
+    var awsconfig = fs.readFileSync("awsconfig.json");
+    awsconfig = JSON.parse(awsconfig);
+    aws.config.update({
+        secretAccessKey: awsconfig.secretAccessKey,
+        accessKeyId: awsconfig.accessKeyId,
+        region: awsconfig.region
+    });
+} else {
+    aws.config.update({
+        secretAccessKey: process.env.S3secretAccessKey,
+        accessKeyId: process.env.S3accessKeyId,
+        region: process.env.S3region
+    });
+
 }
 
 var s3 = new aws.S3();
@@ -37,12 +39,33 @@ var app = express();
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-if (process.env.NODE_ENV == "development" || true ) {
+//this exposes node_modules during development, move required files to seperate public directory before publishing. Check public/index/index.html script tags for a list of files to be moved.
+if (process.env.NODE_ENV == "development" || true) {
 
     app.use("/node_modules", express.static(__dirname + '/node_modules'));
 
 }
 app.use(logger('dev'));
+//get cookieSession variables from process vars if we're in production
+var cookieOptions = {};
+if (process.env.NODE_ENV !== "production") {
+    cookieOptions = {
+        name: "session",
+        keys: ["ALZxA1z5+=6660|F629w]>6Lf,|Hwb6FyQ-7-5~~W~2Ro6z$#'4N1sz4]I8uTI2"],
+        secret: "ALZxA1z5+=6660|F629w]>6Lf,|Hwb6FyQ-7-5~~W~2Ro6z$#'4N1sz4]I8uTI2"
+    };
+} else {
+    cookieOptions = {
+        name: process.env.defaultCookieName,
+        keys: [process.env.cookieSecret],
+        secret: process.env.cookieSecret
+    };
+}
+
+app.use(cookieSession(cookieOptions));
+
+
+
 app.use(bodyParser.urlencoded({
     extended: true
 }));
@@ -55,54 +78,63 @@ app.use("/public", express.static(__dirname + "/public"));
 
 //functions
 
-function objectHasProp (obj, prop){
-    
-return Object.prototype.hasOwnProperty.call(obj, prop);
-    
+function objectHasProp(obj, prop) {
+
+    return Object.prototype.hasOwnProperty.call(obj, prop);
+
 }
 
 
 //Registers new user accounts.
-app.post("/users/registernewuser", upload.none(), function (req, res){
+app.post("/users/registernewuser", upload.none(), function (req, res) {
     //cannot trust that hasOwnProperty will exist because object is submitted by user could allow for hasOwnProperty to be overwritten. Move hasOwnProperty to a seperate function.
-    if(objectHasProp(req.body, "username") && objectHasProp(req.body, "password")){
+    if (objectHasProp(req.body, "username") && objectHasProp(req.body, "password")) {
         //process data to create a new user account. Send either success or failure back to front end.
         db.user.create({
             username: req.body.username,
-            password: req.body.password 
-        }).then(function(user){
-        console.log(user);
-        res.cookie("Authorization", "I'm a cookie.");
-        res.send("Success");
-        
-        }, function(err){
-        console.log(err);
-        res.send("Failed to create new user.");
-        
+            password: req.body.password
+        }).then(function (user) {
+            res.send("Success");
+        }, function (err) {
+            console.log(err);
+            res.send("Failed to create new user.");
         })
-        
+
     }
-    
-    
-    
+
+
+
 })
 
 //Logs in user accounts.
-app.post("/users/login", upload.none(), function (req, res){
-   console.log(req.body);
-    if(objectHasProp(req.body, "username") && objectHasProp(req.body, "password")){
-        
-        //process credentials and return a session ID or handle rejection.
-        var body = {username: req.body.username, password: req.body.password};
-        db.user.authenticateUser(body).then(function(user){
-            res.send(user);
-        }, function(err){
-            res.send(err);
-            
-            
+app.post("/users/login", upload.none(), function (req, res) {
+    if (objectHasProp(req.body, "username") && objectHasProp(req.body, "password")) {
+
+        //process credentials and return a session cookie or handle rejection.
+        var body = {
+            username: req.body.username,
+            password: req.body.password
+        };
+        db.user.authenticateUser(body).then(function (user) {
+            crypto.randomBytes(128, (err, bytes) => {
+                if (err) {
+                    console.log(err);
+                    res.send("Error: Unable to generate random bytes.");
+                    return;
+                }
+                req.session.usersession = bytes.toString("base64");
+                res.status(200);
+                console.log("Thing below this is user.");
+                console.log(user);
+                res.json({login: true, username: user.username});
+
+            })
+        }, function (err) {
+            console.log(err);
+            res.json({login: false});
         });
-        
-        
+
+
     }
 })
 
@@ -118,9 +150,9 @@ app.post('/api/uploadnewimage', upload.single('image'), function (req, res) {
                 key: req.file.key
             })
             .then(function (image) {
-            console.log(image);
-            res.status(200);
-            res.end();
+                console.log(image);
+                res.status(200);
+                res.end();
             })
             .catch(function (err) {
                 console.log(err);
@@ -155,11 +187,19 @@ app.get("/api/last10images", function (req, res) {
 //returns most recent images in groups of 30, accepts 1 parameter for pagination
 
 app.get("/api/recentimages/:page", function (req, res) {
-if(req.params.page == "undefined"){
-req.params.page = 0;
-}
-console.log("Recent images " + req.params.page + ".");
-db.image.findAll({limit: 30, order:[["createdAt", "DESC"]], attributes:{exclude: ["fileDir", "id"]}, offset: req.params.page * 30 }).then(function (images) {
+    console.log(req.session);
+    if (req.params.page == "undefined") {
+        req.params.page = 0;
+    }
+    console.log("Recent images " + req.params.page + ".");
+    db.image.findAll({
+        limit: 30,
+        order: [["createdAt", "DESC"]],
+        attributes: {
+            exclude: ["fileDir", "id"]
+        },
+        offset: req.params.page * 30
+    }).then(function (images) {
         if (images) {
             console.log(images.length);
             res.json(images);
@@ -187,25 +227,28 @@ app.get("/getimage/:key", function (req, res) {
         }
     }).then(function (image) {
         if (image) {
-            
-            s3.getObject({Key: image.key, Bucket: "bucketofimageswithfries"}, function(err, data){
-            if(err){
-            console.log(err);
-            res.status(404);
-            res.end();
-            return;
-            }    
-            
-            console.log(data);
-            res.type(path.extname(image.key));
-            res.send(data.Body);
-                
-            })
-            //use key to retrieve signed url from Amazon S3 then serve to user
-            /*
-            console.log(image.fileDir);
-            res.sendFile(image.fileDir);
-            */
+
+            s3.getObject({
+                    Key: image.key,
+                    Bucket: "bucketofimageswithfries"
+                }, function (err, data) {
+                    if (err) {
+                        console.log(err);
+                        res.status(404);
+                        res.end();
+                        return;
+                    }
+
+                    console.log(data);
+                    res.type(path.extname(image.key));
+                    res.send(data.Body);
+
+                })
+                //use key to retrieve signed url from Amazon S3 then serve to user
+                /*
+                console.log(image.fileDir);
+                res.sendFile(image.fileDir);
+                */
         } else {
             let error = new Error("No Image Found in DB with imagename " + req.params.key);
             error.name = "Error GET /getimage/:imagename | Image not Found";
@@ -262,9 +305,7 @@ app.use(function (req, res, next) {
 });
 
 db.sequelize.sync().then(function () {
-    app.listen(function () {
-        console.log("Listening on " + app.locals.port);
-    });
+    console.log("DB Ready")
 });
 
 

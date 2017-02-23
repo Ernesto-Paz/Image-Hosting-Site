@@ -8,6 +8,9 @@ export class GlobalHttpService {
     
   public onImageSubmit = new EventEmitter();
     public onUserLogin = new EventEmitter();
+    public isUserLoggedIn = false;
+    public username = "default";
+    public ImagesArray = [];
 
     //private headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     //private options = new RequestOptions({ headers: this.headers });
@@ -45,7 +48,7 @@ public submitform(form: FormData, url: string, method: string, callback: Functio
 xhr.onreadystatechange = function(){
 if(xhr.readyState == 4 && xhr.status == 200){
     console.log("Form Submission Callback");
-    callback();
+    callback(xhr.response);
 }else if(xhr.readyState == 4){
     console.log("Form Submission Callback");
     callback();

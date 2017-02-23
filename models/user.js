@@ -27,7 +27,7 @@ module.exports = function (sequelize, DataTypes) {
                 }
             },
             adminLevel: {
-                type: DataTypes.STRING,
+                type: DataTypes.ENUM("StandardUser", "ModeratorUser", "AdminUser"),
                 defaultValue: "StandardUser"
                 // StandardUser, ModeratorUser, AdminUser
             }
@@ -64,7 +64,7 @@ module.exports = function (sequelize, DataTypes) {
                             bcrypt.compare(body.password, user.passwordHash, function (err, result) {
                                 if (result == true) {
                                     console.log("Correct password.")
-                                    resolve("True");
+                                    resolve({username: user.username});
 
                                 } else {
                                     console.log("Incorrect password.")

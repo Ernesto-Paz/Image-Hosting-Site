@@ -11,14 +11,14 @@ import { HomepageComponent }  from './homepage/homepage.component';
 import { SoloImagePageComponent } from "./soloimagepage/soloimagepage.component";
 import { ImgSubmitFormComponent } from "./imgsubmitform/imgsubmitform.component";
 import { UserRegistrationFormComponent } from "./userregistrationform/userregistrationform.component";
-import { NavBarUserLoginFormComponent } from "./navbaruserloginform/navbaruserloginform.component";
+import { NavBarComponent } from "./navbar/navbar.component";
 
 import { AppRoutingModule } from "./app.routing.module";
 
 
 @NgModule({
   imports: [ BrowserModule, HttpModule, AppRoutingModule, FormsModule ],
-  declarations: [ HomepageComponent, ImgThumbnailComponent, AppComponent, SoloImagePageComponent, ImgSubmitFormComponent, UserRegistrationFormComponent, NavBarUserLoginFormComponent],
+  declarations: [ HomepageComponent, ImgThumbnailComponent, AppComponent, SoloImagePageComponent, ImgSubmitFormComponent, UserRegistrationFormComponent, NavBarComponent],
   providers: [GlobalHttpService],
   bootstrap: [ AppComponent ]
 })

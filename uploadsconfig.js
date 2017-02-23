@@ -26,6 +26,8 @@ var s3 = new aws.S3();
 var fs = require('fs');
 var path = require('path');
 
+
+//outdated chunk of code was used during prototyping when image storage was local.
 var id = 10000;
 newdir = __dirname + "/uploads/";
 fs.mkdir(newdir, (err) => {
@@ -80,6 +82,7 @@ var storage = multerS3({
     key: function (req, file, cb) {
         console.log(file);
         fileextension = path.extname(file.originalname);
+        //currently using Data.now in order to generate unique ids for images, look for a better method.
         req.fileId = removebase64padding(Buffer.from(Date.now().toString()).toString('base64'))
         req.filename = req.fileId + fileextension;
         cb(null, req.filename);
