@@ -59,6 +59,9 @@ module.exports = function (sequelize, DataTypes) {
                                 username: username
                             }
                         }).then(function (user) {
+                            if(!user){
+                            reject("User not found.")    
+                            }
                             console.log(body.password); //currently logs undefined
                             console.log(user.passwordHash);
                             bcrypt.compare(body.password, user.passwordHash, function (err, result) {

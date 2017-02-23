@@ -25,7 +25,7 @@ onSubmit(){
         
     res = JSON.parse(res); 
     console.log(res);
-    if(res.login = true){
+    if(res.login == true){
         this.globalhttp.isUserLoggedIn = true;
         if(res.username){ //need to check if response sent a username before making change.
             this.globalhttp.username = res.username;
