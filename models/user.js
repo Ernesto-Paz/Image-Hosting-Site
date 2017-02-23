@@ -60,7 +60,7 @@ module.exports = function (sequelize, DataTypes) {
                             }
                         }).then(function (user) {
                             if(!user){
-                            reject("User not found.")    
+                            return reject("User not found.");
                             }
                             console.log(body.password); //currently logs undefined
                             console.log(user.passwordHash);
