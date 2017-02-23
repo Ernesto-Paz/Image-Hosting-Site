@@ -1,5 +1,7 @@
 import { Component, ViewChild } from "@angular/core";
 import { GlobalHttpService } from "../services/http.service";
+import {UserRegistrationFormComponent} from "../userregistrationform/userregistrationform.component";
+import {ImgSubmitFormComponent} from "../imgsubmitform/imgsubmitform.component";
 
     @Component({
         moduleId: module.id,
