@@ -12,8 +12,23 @@ var crypto = require("crypto");
 var upload = require("./uploadsconfig.js").singleupload;
 var albumupload = require("./uploadsconfig.js").albumupload;
 var imageid = require("./uploadsconfig.js").imageid;
+var readline = require("readline");
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
 var db = require("./models/index.js");
+
+rl.on("line", function (text) {
+    if(text == "dropalldb"){
+      db.sequelize.sync({force:true}).then(function () {
+        console.log("DB Ready")
+      });  
+        
+    }
+    
+});
 
 var S3_BUCKET = "bucketofimageswithfries";
 if (process.env.NODE_ENV !== "production") {

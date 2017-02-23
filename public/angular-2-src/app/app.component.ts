@@ -1,6 +1,4 @@
 import { Component } from "@angular/core";
-import {ImgSubmitFormComponent} from "../imgsubmitform/imgsubmitform.component";
-import {UserRegistrationFormComponent} from "../userregistrationform/userregistrationform.component";
 
     @Component ({
         moduleId: module.id,
