@@ -269,7 +269,7 @@ app.get("/api/last10images", function (req, res) {
 
 });
 
-//returns most recent images in groups of 30, accepts 1 parameter for pagination. Used by Angular 2
+//returns most recent images in groups of 30, accepts 1 parameter for pagination. Used by Angular 2. Currently returns limited user associations as well.
 
 app.get("/api/recentimages/:page", function (req, res) {
     if (req.params.page == "undefined") {

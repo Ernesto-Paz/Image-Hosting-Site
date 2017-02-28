@@ -20,7 +20,7 @@ module.exports = function (sequelize, DataTypes) {
         },
         privacy: {
             
-        type: DataTypes.ENUM("Useronly", "Unlisted", "Pubilc"),
+        type: DataTypes.ENUM("Useronly", "Unlisted", "Public"),
         defaultValue: "Public"
             
         }
