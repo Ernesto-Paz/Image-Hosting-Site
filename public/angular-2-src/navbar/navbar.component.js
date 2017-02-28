@@ -14,26 +14,6 @@ var NavBarComponent = (function () {
     function NavBarComponent(globalhttp) {
         this.globalhttp = globalhttp;
     }
-    NavBarComponent.prototype.onSubmit = function () {
-        var _this = this;
-        var form = this.navbar.nativeElement;
-        console.log(form);
-        var loginform = new FormData(form);
-        this.globalhttp.submitform(loginform, "/users/login", "POST", function (res) {
-            res = JSON.parse(res);
-            console.log(res);
-            if (res.login == true) {
-                console.log("Running from in if statement.");
-                console.log(res.login);
-                _this.globalhttp.isUserLoggedIn = true;
-                if (res.username) {
-                    _this.globalhttp.username = res.username;
-                }
-            }
-            else {
-            }
-        });
-    };
     __decorate([
         core_1.ViewChild("navbar"), 
         __metadata('design:type', Object)
@@ -49,4 +29,4 @@ var NavBarComponent = (function () {
     return NavBarComponent;
 }());
 exports.NavBarComponent = NavBarComponent;
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmF2YmFyLmNvbXBvbmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIm5hdmJhci5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUFxQyxlQUFlLENBQUMsQ0FBQTtBQUNyRCw2QkFBa0MsMEJBQTBCLENBQUMsQ0FBQTtBQVU3RDtJQUVBLHlCQUFvQixVQUE2QjtRQUE3QixlQUFVLEdBQVYsVUFBVSxDQUFtQjtJQUlqRCxDQUFDO0lBRUQsa0NBQVEsR0FBUjtRQUFBLGlCQXFCQztRQXBCRyxJQUFJLElBQUksR0FBRyxJQUFJLENBQUMsTUFBTSxDQUFDLGFBQWEsQ0FBQztRQUNyQyxPQUFPLENBQUMsR0FBRyxDQUFDLElBQUksQ0FBQyxDQUFDO1FBQ2xCLElBQUksU0FBUyxHQUFjLElBQUksUUFBUSxDQUFDLElBQUksQ0FBQyxDQUFDO1FBQzlDLElBQUksQ0FBQyxVQUFVLENBQUMsVUFBVSxDQUFDLFNBQVMsRUFBRSxjQUFjLEVBQUUsTUFBTSxFQUFFLFVBQUMsR0FBRztZQUNsRSxHQUFHLEdBQUcsSUFBSSxDQUFDLEtBQUssQ0FBQyxHQUFHLENBQUMsQ0FBQztZQUN0QixPQUFPLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxDQUFDO1lBQ2pCLEVBQUUsQ0FBQSxDQUFDLEdBQUcsQ0FBQyxLQUFLLElBQUksSUFBSSxDQUFDLENBQUEsQ0FBQztnQkFDdEIsT0FBTyxDQUFDLEdBQUcsQ0FBQywrQkFBK0IsQ0FBQyxDQUFBO2dCQUM1QyxPQUFPLENBQUMsR0FBRyxDQUFDLEdBQUcsQ0FBQyxLQUFLLENBQUMsQ0FBQztnQkFDbkIsS0FBSSxDQUFDLFVBQVUsQ0FBQyxjQUFjLEdBQUcsSUFBSSxDQUFDO2dCQUN0QyxFQUFFLENBQUEsQ0FBQyxHQUFHLENBQUMsUUFBUSxDQUFDLENBQUEsQ0FBQztvQkFDYixLQUFJLENBQUMsVUFBVSxDQUFDLFFBQVEsR0FBRyxHQUFHLENBQUMsUUFBUSxDQUFDO2dCQUM1QyxDQUFDO1lBQ0wsQ0FBQztZQUNMLElBQUksQ0FBQSxDQUFDO1lBSUwsQ0FBQztRQUNHLENBQUMsQ0FBQyxDQUFDO0lBQ1AsQ0FBQztJQTVCRztRQUFDLGdCQUFTLENBQUMsUUFBUSxDQUFDOzttREFBQTtJQVBwQjtRQUFDLGdCQUFTLENBQUM7WUFDUCxRQUFRLEVBQUUsTUFBTSxDQUFDLEVBQUU7WUFDbkIsUUFBUSxFQUFFLFFBQVE7WUFDbEIsV0FBVyxFQUFDLHlCQUF5QjtTQUNwQyxDQUFDOzt1QkFBQTtJQWlDVixzQkFBQztBQUFELENBQUMsQUEvQkQsSUErQkM7QUEvQlksdUJBQWUsa0JBK0IzQixDQUFBIn0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibmF2YmFyLmNvbXBvbmVudC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIm5hdmJhci5jb21wb25lbnQudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQUFBLHFCQUFxQyxlQUFlLENBQUMsQ0FBQTtBQUNyRCw2QkFBa0MsMEJBQTBCLENBQUMsQ0FBQTtBQVc3RDtJQUVBLHlCQUFvQixVQUE2QjtRQUE3QixlQUFVLEdBQVYsVUFBVSxDQUFtQjtJQUlqRCxDQUFDO0lBTEc7UUFBQyxnQkFBUyxDQUFDLFFBQVEsQ0FBQzs7bURBQUE7SUFQcEI7UUFBQyxnQkFBUyxDQUFDO1lBQ1AsUUFBUSxFQUFFLE1BQU0sQ0FBQyxFQUFFO1lBQ25CLFFBQVEsRUFBRSxRQUFRO1lBQ2xCLFdBQVcsRUFBQyx5QkFBeUI7U0FDcEMsQ0FBQzs7dUJBQUE7SUFXVixzQkFBQztBQUFELENBQUMsQUFURCxJQVNDO0FBVFksdUJBQWUsa0JBUzNCLENBQUEifQ==

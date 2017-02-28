@@ -25,11 +25,18 @@ this.route.params.forEach((params: Params)=>{
 }
 
 private getsingleimage(){
-
     this.globalhttp.getsingleimage(this.fileId).subscribe(
         (res) => this.image = res ,
         (error) => console.log(error),
-() => {console.log("Done getting image info"); console.log(this.image); this.image.url = "/getimage/" + this.image.key; }
+() => {
+    if(this.image){
+        console.log("Done getting image info"); console.log(this.image); this.image.url = "/getimage/" + this.image.key;
+        }
+    else{
+        
+        //throw a 404 here
+        
+}}
     );
 
 }    

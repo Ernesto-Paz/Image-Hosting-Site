@@ -34,7 +34,7 @@ var ImgSubmitFormComponent = (function () {
         this.uploadingImage = true;
         var form = this.uploadform.nativeElement;
         var imageform = new FormData(form);
-        this.globalhttp.submitform(imageform, "/api/uploadnewimage", "POST", function () { _this.globalhttp.onImageSubmit.emit(); });
+        this.globalhttp.submitForm(imageform, "/api/uploadnewimage", "POST", function () { _this.globalhttp.onImageSubmit.emit(); });
         //this.globalhttp.postsingleimage()
     };
     Object.defineProperty(ImgSubmitFormComponent.prototype, "diagnostic", {

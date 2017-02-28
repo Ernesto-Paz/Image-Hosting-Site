@@ -43,9 +43,16 @@ Object.keys(db).forEach(function(modelName) {
 
 db.user.hasMany(db.album);
 db.user.hasMany(db.image);
-db.user.hasOne(db.sessions);
+db.user.hasMany(db.vote);
+db.user.hasOne(db.session);
+db.image.hasMany(db.vote);
+
+
 db.album.belongsTo(db.user);
 db.image.belongsTo(db.user);
+db.session.belongsTo(db.user);
+db.vote.belongsTo(db.user);
+db.vote.belongsTo(db.image);
 db.album.belongsToMany(db.image, {through: "AlbumImage"});
 db.image.belongsToMany(db.album, {through: "AlbumImage"});
 

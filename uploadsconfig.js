@@ -80,7 +80,6 @@ var storage = multerS3({
     
     //in converting to s3 this key function should return the key for the file in the bucket. Ideally usning Date.now() to avoid duplicates.
     key: function (req, file, cb) {
-        console.log(file);
         fileextension = path.extname(file.originalname);
         //currently using Data.now in order to generate unique ids for images, look for a better method.
         req.fileId = removebase64padding(Buffer.from(Date.now().toString()).toString('base64'))

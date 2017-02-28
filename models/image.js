@@ -11,9 +11,29 @@ module.exports = function (sequelize, DataTypes) {
         key: {
             type:DataTypes.STRING, 
             allowNull: false
+        },
+        score: {
+            
+        type:DataTypes.INTEGER,
+        defaultValue: 0
+        
+        },
+        privacy: {
+            
+        type: DataTypes.ENUM("Useronly", "Unlisted", "Pubilc"),
+        defaultValue: "Public"
+            
         }
         
-    })
+    }, {instancemethods: {
+         calculateScore: function(){
+             
+             
+             
+         }                   
+                            
+                            
+                            }})
 }
 
 //setting model for database table "images"

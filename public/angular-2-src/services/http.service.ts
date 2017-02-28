@@ -22,7 +22,7 @@ export class GlobalHttpService {
 public getlast10(): Observable <any>{
             console.log("getlast10 called.");
             let imageurl = this.rooturl + "last10images";
-            return this.http.get(imageurl).map(this.ResponseData);
+        return this.http.get(imageurl).map(this.ResponseData);
 }
 
 public getrecentimages(pageNumber?: Number): Observable<Response>{
@@ -40,23 +40,46 @@ public getsingleimage(imagename: string): Observable<any>{
     return this.http.get(imageurl).map(this.ResponseData);
 }
     
-public submitform(form: FormData, url: string, method: string, callback: Function){
+public submitForm(form: FormData, url: string, method: string, callback: Function){
     let xhr: XMLHttpRequest = new XMLHttpRequest();
     let Imagesubmit = this.onImageSubmit;
     xhr.open(method , url, true);
     xhr.setRequestHeader("enctype", "multipart/form-data");
-xhr.onreadystatechange = function(){
-if(xhr.readyState == 4 && xhr.status == 200){
-    console.log("Form Submission Callback");
-    callback(xhr.response);
-}else if(xhr.readyState == 4){
-    console.log("Form Submission Callback");
-    callback();
-}
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4 && xhr.status == 200){
+            console.log("Form Submission Callback");
+            callback(xhr.response);
+        }else if(xhr.readyState == 4){
+            console.log("Form Submission Callback");
+            callback();
+        }
 
-}
-    xhr.send(form);
-} 
+    }
+        xhr.send(form);
+    }
+    
+public sendRequest(url: string, method: string, data: any, callback: Function){
+    
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.open(method, url, true);
+    data = JSON.stringify(data);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4 && xhr.status == 200){
+            console.log("Form Submission Callback");
+            callback(xhr.response);
+        }else if(xhr.readyState == 4){
+            console.log("Form Submission Callback");
+            callback(xhr.response);
+        }
+
+    }
+        xhr.send(data);
+    
+    
+    
+    
+}  
     
 public ResponseData(res: Response){
     console.log("ResponseData Function")

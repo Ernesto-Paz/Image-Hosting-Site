@@ -20,3 +20,8 @@ req.file object created by multer
   path: '/Users/Gatobro/NodePrograms/Image-Hosting-Site/uploads/MTAwMDA.jpg',
   size: 425463 }
 
+
+
+ToDo
+
+1. Remove userinfo from recentimages api call if not needed.

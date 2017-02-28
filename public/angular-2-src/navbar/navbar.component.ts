@@ -2,6 +2,7 @@ import { Component, ViewChild } from "@angular/core";
 import { GlobalHttpService } from "../services/http.service";
 import {UserRegistrationFormComponent} from "../userregistrationform/userregistrationform.component";
 import {ImgSubmitFormComponent} from "../imgsubmitform/imgsubmitform.component";
+import { UserLoginFormComponent } from "../userloginform/userloginform.component"; 
 
     @Component({
         moduleId: module.id,
@@ -16,28 +17,6 @@ constructor(private globalhttp: GlobalHttpService){
     
     
 }
-
-onSubmit(){
-    let form = this.navbar.nativeElement;
-    console.log(form);
-    let loginform: FormData  = new FormData(form);
-    this.globalhttp.submitform(loginform, "/users/login", "POST", (res)=> {
-    res = JSON.parse(res); 
-    console.log(res);
-    if(res.login == true){
-    console.log("Running from in if statement.")
-    console.log(res.login);
-        this.globalhttp.isUserLoggedIn = true;
-        if(res.username){ //need to check if response sent a username before making change.
-            this.globalhttp.username = res.username;
-        }
-    }
-else{
-
-    //Communicate login failure to user.
     
-}
-    });
-}    
     
 }

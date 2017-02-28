@@ -57,8 +57,24 @@ cursor: pointer;
 margin-top:20px;
 }
 
+.img-largesolo{
+max-width: 100%;
+height:auto;
+display:block;
+margin:auto;
+object-fit:contain;
+}
+
+.panel-body{
+background-color:lightgray;
+padding:0px; 
+}
+
+.center{
+margin:auto;    
+    
+}
+
 a:hover{
 cursor:pointer;
-    
-    
 }

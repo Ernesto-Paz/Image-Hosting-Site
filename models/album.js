@@ -1,6 +1,6 @@
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define("album", { 
-        albumname: {
+        albumName: {
             type: DataTypes.STRING,
             allowNull: false  
         }

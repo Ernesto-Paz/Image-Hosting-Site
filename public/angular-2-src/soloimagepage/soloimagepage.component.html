@@ -1,5 +1,13 @@
-<div class="row image-title">
-{{fileId}}
-{{image}}
-<img class = "img-rounded" src ="{{image?.url}}" style="object-fit:cover;"> 
+<div class="row">
+    {{fileId}}
+    {{image}}
+    <div class="col-md-9 center-block">
+        <div class="panel panel-default">
+            <div *ngIf="image?.title" class="panel-heading">{{image?.title}}<br> By Person</div>
+            <div class="panel-body">
+            <img class = "img-rounded img-largesolo" src ="{{image?.url}}">
+            </div>
+            <div class="panel-heading">Score: 0 Updoot Downdoot</div>
+        </div>
+    </div>
 </div>

@@ -62,12 +62,10 @@ module.exports = function (sequelize, DataTypes) {
                             if(!user){
                             return reject("User not found.");
                             }
-                            console.log(body.password); //currently logs undefined
-                            console.log(user.passwordHash);
                             bcrypt.compare(body.password, user.passwordHash, function (err, result) {
                                 if (result == true) {
                                     console.log("Correct password.")
-                                    resolve({username: user.username});
+                                    resolve({username: user.username, id: user.id});
 
                                 } else {
                                     console.log("Incorrect password.")
@@ -97,13 +95,6 @@ module.exports = function (sequelize, DataTypes) {
 
             },
             instanceMethods: {
-
-                generateSessionID: function () {
-
-
-
-
-                }
 
 
             }

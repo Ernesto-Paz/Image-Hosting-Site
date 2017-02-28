@@ -31,7 +31,7 @@ var UserRegistrationFormComponent = (function () {
         this.registering = true;
         var form = this.uploadform.nativeElement;
         var registrationform = new FormData(form);
-        this.globalhttp.submitform(registrationform, "/users/registernewuser", "POST", function () { _this.registering = false; _this.toggleModal(); });
+        this.globalhttp.submitForm(registrationform, "/users/registernewuser", "POST", function () { _this.registering = false; _this.toggleModal(); });
         //this.globalhttp.postsingleimage()
     };
     Object.defineProperty(UserRegistrationFormComponent.prototype, "diagnostic", {

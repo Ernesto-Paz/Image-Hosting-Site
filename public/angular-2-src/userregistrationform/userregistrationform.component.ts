@@ -39,7 +39,7 @@ onSubmit(){
     this.registering = true;
     let form = this.uploadform.nativeElement;
     let registrationform: FormData  = new FormData(form);
-    this.globalhttp.submitform(registrationform, "/users/registernewuser", "POST", ()=> {this.registering = false; this.toggleModal();});
+    this.globalhttp.submitForm(registrationform, "/users/registernewuser", "POST", ()=> {this.registering = false; this.toggleModal();});
     //this.globalhttp.postsingleimage()
 }
     

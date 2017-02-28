@@ -17,7 +17,6 @@ public loadingnewpage: boolean = false;
 onScroll(event){
 if((window.innerHeight + event.pageY) >= (document.body.scrollHeight - 50) && this.loadingnewpage == false){
     console.log("Bottom");
-    this.loadingnewpage = true;
     this.getImages(this.pageOffset);
 } 
 
@@ -36,22 +35,26 @@ ngOnInit(){
 }
     
 private getImages(pageOffset: number){
-    this.globalhttp.getrecentimages(pageOffset).subscribe(
-        (res) => {
-    if(this.recentimagesarray.length == 0){
-        this.recentimagesarray.push(res);
+    if(this.loadingnewpage == false){
+            this.loadingnewpage = true;
+            this.globalhttp.getrecentimages(pageOffset).subscribe(
+                (res) => {
+            if(this.recentimagesarray.length == 0){
+                this.recentimagesarray.push(res);
+                }
+                this.recentimagesarray[this.pageOffset] = res;
+                console.log(this.recentimagesarray);
+                console.log(this.recentimagesarray[this.pageOffset]);
+                if(this.recentimagesarray[this.pageOffset].length >= 30){
+                this.pageOffset++;
+                }
+                },
+                (error) => console.log(error),
+                () => {console.log("Done getting images.");
+                setTimeout(()=>{this.loadingnewpage = false;}, 1000)
+                }
+                )
         }
-        this.recentimagesarray[this.pageOffset] = res;
-        console.log(this.recentimagesarray);
-        console.log(this.recentimagesarray[this.pageOffset]);
-        if(this.recentimagesarray[this.pageOffset].length >= 30){
-        this.pageOffset++;
-        }
-        this.loadingnewpage = false;
-        },
-        (error) => console.log(error),
-        () => {console.log("Done getting images.");}
-        )
 }
     
 
