@@ -44,10 +44,14 @@ private getsingleimage(){
 private vote(data: any){
     let imagekey = this.image.key;
     this.globalhttp.postRequestObservable("/api/submitvote/" + imagekey ,data).subscribe(
-        (res) => {}   ,
-        (error) => {}  ,
-() => {
-    
+        (res) => {console.log("Got response!")}   ,
+        (error) => {console.log("got an error"); console.log(error);}  ,
+        () => {
+        console.log("Callback from vote post.")
+        this.globalhttp.sendRequest("/api/getscore/" + this.image.id, "GET", {}, (res) => {
+        console.log(res);
+        this.image.vote = res;
+        })
     
     
 }

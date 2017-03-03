@@ -71,10 +71,12 @@ public sendRequest(url: string, method: string, data: any, callback: Function){
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4 && xhr.status == 200){
             console.log("Form Submission Callback");
-            callback(xhr.response);
+            let res = JSON.parse(xhr.response);
+            callback(res);
         }else if(xhr.readyState == 4){
             console.log("Form Submission Callback");
-            callback(xhr.response);
+            let res = JSON.parse(xhr.response);
+            callback(res);
         }
     }
         xhr.send(data);

@@ -365,65 +365,118 @@ app.get("/api/:fileId", function (req, res) {
                  }]
 
     }).then(function (image) {
-        //Cannot make changes in db related to image since we asked for a raw object
         if (image) {
-            db.vote.findAll({where:{imageId: image.id}, raw:true }).then(function(votesarray){
-                function votecounter(votesarray, index, storageobject){
-                    if(typeof storageobject == "undefined"){
+            db.vote.findAll({
+                where: {
+                    imageId: image.id
+                },
+                raw: true
+            }).then(function (votesarray) {
+                function votecounter(votesarray, index, storageobject) {
+                    if (typeof storageobject == "undefined") {
                         storageobject = {};
-                        storageobject.upvote = 0; 
+                        storageobject.upvote = 0;
                         storageobject.downvote = 0;
                     }
-                    if(votesarray[index].vote == 1){
-                        storageobject.upvote++;    
-                    }
-                    else if(votesarray[index].vote == -1){
+                    if (votesarray[index].vote == 1) {
+                        storageobject.upvote++;
+                    } else if (votesarray[index].vote == -1) {
                         storageobject.downvote--;
                     }
-                    
-                    if(index < votesarray.length){
+
+                    if (index < votesarray.length) {
                         index++;
-                        if (index >= votesarray.length){
-                        storageobject.score = storageobject.downvote + storageobject.upvote;
-                        console.log(storageobject);
-                        return storageobject;
-                    }else{   
-                        process.nextTick(votecounter(votesarray, index, storageobject));
+                        if (index >= votesarray.length) {
+                            storageobject.score = storageobject.downvote + storageobject.upvote;
+                            console.log(storageobject);
+                            image.vote = storageobject;
+                            res.json(image);
+                        } else {
+                            process.nextTick(() => votecounter(votesarray, index, storageobject));
+                        }
                     }
-                    }
-                    
                 }
-                if(votesarray.length > 0){
-                let votecount = votecounter(votesarray, 0);
-                image = image.get({plain:true});
-                image.vote = votecount;
-                delete image.id;
-                console.log(image);
+                image = image.get({
+                    plain: true
+                });
+
+                if (votesarray.length > 0) {
+                    votecounter(votesarray, 0)
+                } else {
+                    var votecount = {};
+                    votecount.upvote = 0;
+                    votecount.downvote = 0;
+                    votecount.score = 0;
+                    image.vote = votecount;
+                    res.json(image);
                 }
-                res.json(image);    
+
             })
+
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.fileId);
             error.name = "Error GET /api/imageinfo/:imagename | Image not Found";
             throw error;
         }
-    });
+    })
+})
 
-});
+app.get("/api/getscore/:id", function (req, res) {
+    db.vote.findAll({
+        where: {
+            imageId: req.params.id
+        },
+        raw: true
+    }).then(function (votesarray) {
+                function votecounter(votesarray, index, storageobject) {
+                    if (typeof storageobject == "undefined") {
+                        storageobject = {};
+                        storageobject.upvote = 0;
+                        storageobject.downvote = 0;
+                    }
+                    if (votesarray[index].vote == 1) {
+                        storageobject.upvote++;
+                    } else if (votesarray[index].vote == -1) {
+                        storageobject.downvote--;
+                    }
+
+                    if (index < votesarray.length) {
+                        index++;
+                        if (index >= votesarray.length) {
+                            storageobject.score = storageobject.downvote + storageobject.upvote;
+                            console.log(storageobject);
+                            res.json(storageobject);
+                        } else {
+                            process.nextTick(() => votecounter(votesarray, index, storageobject));
+                        }
+                    }
+                }
+                if (votesarray.length > 0) {
+                    votecounter(votesarray, 0)
+                } else {
+                    var votecount = {};
+                    votecount.upvote = 0;
+                    votecount.downvote = 0;
+                    votecount.score = 0;
+                    console.log(votecount);
+                    res.json(votecount);
+                }
+    })
+})
 
 
 //This api call will submit both positive and negative votes. It will not take an integer, it will take a boolean. This avoids issues with people sending integers and stuff.
 app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
 
-        if (req.body.vote === true) {
-            req.body.vote = 1
-        } else if (req.body.vote === false) {
-            req.body.vote = -1
-        } else if (req.body.vote === null) {
-            req.body.vote = 0
-        } else {
+    if (req.body.vote === true) {
+        req.body.vote = 1
+    } else if (req.body.vote === false) {
+        req.body.vote = -1
+    } else if (req.body.vote === null) {
+        req.body.vote = 0
+    } else {
         res.status(400).send("Bad Request : You know what you did.");
-        }
+    }
 
 
     db.image.findOne({
@@ -469,7 +522,7 @@ app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
 
     }).then(function (newvote) {
         if (newvote) {
-            res.status(200).send("All done.");
+            res.status(200).send({servermsg: "All done."});
             return;
         }
     })
