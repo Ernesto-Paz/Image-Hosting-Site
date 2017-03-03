@@ -1,13 +1,23 @@
 <div class="row">
     {{fileId}}
     {{image}}
-    <div class="col-md-9 center-block">
+    <div class="col-md-8 col-md-offset-1">
         <div class="panel panel-default">
-            <div *ngIf="image?.title" class="panel-heading">{{image?.title}}<br> By Person</div>
+            <div *ngIf="image?.title" class="panel-heading">{{image?.title}}<br> By {{image?.user.username}}</div>
             <div class="panel-body">
             <img class = "img-rounded img-largesolo" src ="{{image?.url}}">
             </div>
-            <div class="panel-heading">Score: 0 Updoot Downdoot</div>
+            <div class="panel-heading">Score:{{image?.vote.score}} <i (click)="vote({vote: true})" class="fa fa-arrow-circle-up fa-4x" aria-hidden="true"></i>
+ <i (click)="vote({vote: false})" class="fa fa-arrow-circle-down fa-4x" aria-hidden="true"></i>
+</div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="panel panel-default">
+            <div *ngIf="image?.title" class="panel-heading">Side Panel<br> By Person</div>
+            <div class="panel-body">
+            <img class = "img-rounded img-largesolo" src ="{{image?.url}}">
+            </div>
         </div>
     </div>
 </div>

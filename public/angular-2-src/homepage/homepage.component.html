@@ -14,7 +14,7 @@ Add a title:
 -->
 </div>
 <!-- imgthumbnail is a seperate component used to style the individual preview boxes.-->
-<div *ngFor="let recentimages of recentimagesarray">
+<div *ngFor="let recentimages of localImagesArray">
     <div class="margin-top flex-container-basic">
     <imgthumbnail  class = "flex-child-imgthumb" *ngFor="let recentimage of recentimages" [image] = "recentimage"></imgthumbnail> 
     </div>

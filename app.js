@@ -1,4 +1,5 @@
 var express = require('express');
+var util = require("util")
 var cookieSession = require('cookie-session');
 var path = require('path');
 var fs = require('fs');
@@ -120,7 +121,7 @@ function authenticateUser(req, res, next) {
             where: {
                 sessionId: req.session.userSession
             },
-            include:[ {
+            include: [{
                 model: db.user
             }]
         }).then(function (session) {
@@ -151,6 +152,9 @@ function authenticateUser(req, res, next) {
 
     }
 }
+
+
+//Express Routes
 
 
 //Registers new user accounts.
@@ -217,14 +221,12 @@ app.post("/users/login", upload.none(), function (req, res) {
 //Upload routes, will be moved to new router later
 //for uploads multer stores the folder in req.imagefolder, the full directory in req.newdir, the url is stored in req.imgurl. Uploads to Amazon S3.
 app.post('/api/uploadnewimage', authenticateUser, upload.single('image'), function (req, res) {
-console.log(req.user);
-    if(!req.user){
-    req.user.userId == null;  
-        
+    if (!req.user) {
+        req.user.userId == null;
     }
-    
+
     if (req.file.key && req.file) {
-        console.log("creating new image in db")
+        console.log("creating new image in db");
         db.image.create({
                 title: req.body.title,
                 key: req.file.key,
@@ -283,10 +285,11 @@ app.get("/api/recentimages/:page", function (req, res) {
             exclude: ["fileDir", "id"]
         },
         offset: req.params.page * 30,
-        include:[{model:db.user, 
-                 attributes:{
-                    exclude:["passwordHash", "id", "createdAt", "updatedAt"]  
-                 }
+        include: [{
+            model: db.user,
+            attributes: {
+                exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
+            }
                  }]
     }).then(function (images) {
         if (images) {
@@ -352,18 +355,53 @@ app.get("/api/:fileId", function (req, res) {
             fileId: req.params.fileId
         },
         attributes: {
-            exclude: ["id", "userId", "privacy", "createdAt", "updatedAt"]
+            exclude: ["userId", "privacy", "createdAt", "updatedAt"]
         },
-        include:[{model:db.user, 
-                  attributes:{
-                      exclude:["passwordHash", "id", "createdAt", "updatedAt"]
-                  }
+        include: [{
+            model: db.user,
+            attributes: {
+                exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
+            }
                  }]
 
     }).then(function (image) {
+        //Cannot make changes in db related to image since we asked for a raw object
         if (image) {
-            console.log(image.user)
-            res.json(image);
+            db.vote.findAll({where:{imageId: image.id}, raw:true }).then(function(votesarray){
+                function votecounter(votesarray, index, storageobject){
+                    if(typeof storageobject == "undefined"){
+                        storageobject = {};
+                        storageobject.upvote = 0; 
+                        storageobject.downvote = 0;
+                    }
+                    if(votesarray[index].vote == 1){
+                        storageobject.upvote++;    
+                    }
+                    else if(votesarray[index].vote == -1){
+                        storageobject.downvote--;
+                    }
+                    
+                    if(index < votesarray.length){
+                        index++;
+                        if (index >= votesarray.length){
+                        storageobject.score = storageobject.downvote + storageobject.upvote;
+                        console.log(storageobject);
+                        return storageobject;
+                    }else{   
+                        process.nextTick(votecounter(votesarray, index, storageobject));
+                    }
+                    }
+                    
+                }
+                if(votesarray.length > 0){
+                let votecount = votecounter(votesarray, 0);
+                image = image.get({plain:true});
+                image.vote = votecount;
+                delete image.id;
+                console.log(image);
+                }
+                res.json(image);    
+            })
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.fileId);
             error.name = "Error GET /api/imageinfo/:imagename | Image not Found";
@@ -375,11 +413,66 @@ app.get("/api/:fileId", function (req, res) {
 
 
 //This api call will submit both positive and negative votes. It will not take an integer, it will take a boolean. This avoids issues with people sending integers and stuff.
-app.get("/api/submitvote/:key", function (req, res) {
+app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
 
-    //handle vote submission here.
-    console.log(req.body);
-    console.log(req.params);
+        if (req.body.vote === true) {
+            req.body.vote = 1
+        } else if (req.body.vote === false) {
+            req.body.vote = -1
+        } else if (req.body.vote === null) {
+            req.body.vote = 0
+        } else {
+        res.status(400).send("Bad Request : You know what you did.");
+        }
+
+
+    db.image.findOne({
+        where: {
+            key: req.params.key
+        }
+    }).then(function (image) {
+        if (!image) {
+            res.status(400);
+            res.send("Bad Request : No such image.");
+            return;
+        } else {
+            req.image = image;
+            return db.vote.findOne({
+                where: {
+                    imageId: req.image.id,
+                    userId: req.user.id
+                }
+            });
+
+        }
+
+
+    }).then(function (voterecord) {
+        if (!voterecord) {
+            return db.vote.create({
+                userId: req.user.id,
+                imageId: req.image.id,
+                vote: req.body.vote
+            });
+        } else {
+            if (voterecord.vote !== req.body.vote) {
+                return voterecord.update({
+                    vote: req.body.vote
+                });
+            } else {
+                res.status(400).send("Bad Request: No change in vote.");
+                return;
+            }
+        }
+
+
+
+    }).then(function (newvote) {
+        if (newvote) {
+            res.status(200).send("All done.");
+            return;
+        }
+    })
 
 });
 
@@ -400,8 +493,7 @@ app.use(function (req, res, next) {
     next(err);
 });
 
-db.sequelize.sync({
-}).then(function () {
+db.sequelize.sync({}).then(function () {
     console.log("DB Ready")
 });
 

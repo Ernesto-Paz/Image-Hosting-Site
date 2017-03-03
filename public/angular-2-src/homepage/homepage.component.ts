@@ -13,6 +13,7 @@ import '../rjs-observables';
 
 export class HomepageComponent implements OnInit{
 public loadingnewpage: boolean = false;
+public localImagesArray: any[] = [];
 @HostListener("document:scroll", ["$event"])
 onScroll(event){
 if((window.innerHeight + event.pageY) >= (document.body.scrollHeight - 50) && this.loadingnewpage == false){
@@ -21,10 +22,10 @@ if((window.innerHeight + event.pageY) >= (document.body.scrollHeight - 50) && th
 } 
 
 };
-    public recentimagesarray = [];
     public pageOffset: number;
 constructor(private globalhttp: GlobalHttpService ){
     //subscribe to ImageSubmit event in globalhttp
+    this.localImagesArray = this.globalhttp.getImagesArray();
     globalhttp.onImageSubmit.subscribe(() => this.getImages(this.pageOffset), 
     (err) => console.log(err));
     this.pageOffset = 0;
@@ -39,13 +40,13 @@ private getImages(pageOffset: number){
             this.loadingnewpage = true;
             this.globalhttp.getrecentimages(pageOffset).subscribe(
                 (res) => {
-            if(this.recentimagesarray.length == 0){
-                this.recentimagesarray.push(res);
+            if(this.globalhttp.imagesArray.length == 0){
+                this.globalhttp.imagesArray.push(res);
                 }
-                this.recentimagesarray[this.pageOffset] = res;
-                console.log(this.recentimagesarray);
-                console.log(this.recentimagesarray[this.pageOffset]);
-                if(this.recentimagesarray[this.pageOffset].length >= 30){
+                this.globalhttp.imagesArray[this.pageOffset] = res;
+                console.log(this.globalhttp.imagesArray);
+                console.log(this.globalhttp.imagesArray[this.pageOffset]);
+                if(this.globalhttp.imagesArray[this.pageOffset].length >= 30){
                 this.pageOffset++;
                 }
                 },

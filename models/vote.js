@@ -1,8 +1,9 @@
 module.exports = function (sequelize, DataTypes) {
     return sequelize.define("vote", {
         vote: {
-            type: DataTypes.BOOLEAN,
-            allowNull: true
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            validate: {min: -1, max: 1, isInt: true}
         }
 
     }, {hooks:{

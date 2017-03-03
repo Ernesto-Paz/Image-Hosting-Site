@@ -3,14 +3,18 @@ import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import { Observable }     from 'rxjs/Observable';
 
 @Injectable()
-
 export class GlobalHttpService {
     
   public onImageSubmit = new EventEmitter();
     public onUserLogin = new EventEmitter();
     public isUserLoggedIn = false;
     public username = "default";
-    public ImagesArray = [];
+    public imagesArray = [];
+public getImagesArray(): any[]{
+    
+    return this.imagesArray;
+    
+}
 
     //private headers = new Headers({ 'Content-Type': 'application/json', 'charset': 'UTF-8' });
     //private options = new RequestOptions({ headers: this.headers });
@@ -72,14 +76,20 @@ public sendRequest(url: string, method: string, data: any, callback: Function){
             console.log("Form Submission Callback");
             callback(xhr.response);
         }
-
     }
         xhr.send(data);
     
+} 
+    
+public postRequestObservable(url: string, data: any): Observable <any>{
+    
+     let headers = new Headers({ 'Content-Type': 'application/json' });
+     let options = new RequestOptions({ headers: headers });
+     return this.http.post(url, data, options)
+                    .map(this.ResponseData);
     
     
-    
-}  
+}
     
 public ResponseData(res: Response){
     console.log("ResponseData Function")

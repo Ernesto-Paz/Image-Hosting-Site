@@ -39,6 +39,24 @@ private getsingleimage(){
 }}
     );
 
-}    
+}
+    
+private vote(data: any){
+    let imagekey = this.image.key;
+    this.globalhttp.postRequestObservable("/api/submitvote/" + imagekey ,data).subscribe(
+        (res) => {}   ,
+        (error) => {}  ,
+() => {
+    
+    
+    
+}
+        
+        
+        
+        )
+    
+    
+}
 
 }
