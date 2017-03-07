@@ -153,6 +153,42 @@ function authenticateUser(req, res, next) {
     }
 }
 
+function checkForSession(req, res, next){
+    console.log("Check for Session Middleware")
+    console.log(req.session);
+    if (req.session) {
+        //check session db and return associated user if found.
+        db.session.findOne({
+            where: {
+                sessionId: req.session.userSession
+            },
+            include: [{
+                model: db.user
+            }]
+        }).then(function (session) {
+            if (session) {
+                console.log("Valid Session Found!");
+                req.user = session.user;
+                res.status(200);
+                return next();
+            } else {
+                console.log("Invalid Session!");
+                return next();
+            }
+        }, function (err) {
+            console.log(error);
+            return next();
+        });
+        return;
+    } else {
+        //no session, user not authenticated. Error 401 Unauthorized.
+        console.log("No session found.")
+        return next();
+
+    }
+    
+}
+
 
 //Express Routes
 
@@ -184,7 +220,7 @@ app.post("/users/login", upload.none(), function (req, res) {
 
         //process credentials and return a session cookie or handle rejection.
         var body = {
-            username: req.body.username,
+            username: req.body.username.toLowerCase(),
             password: req.body.password
         };
         db.user.authenticateUser(body).then(function (user) {
@@ -273,25 +309,44 @@ app.get("/api/last10images", function (req, res) {
 
 //returns most recent images in groups of 30, accepts 1 parameter for pagination. Used by Angular 2. Currently returns limited user associations as well.
 
-app.get("/api/recentimages/:page", function (req, res) {
+app.get("/api/recentimages/:page", checkForSession, function (req, res) {
     if (req.params.page == "undefined") {
         req.params.page = 0;
     }
     console.log("Recent images " + req.params.page + ".");
+    var dbJoins = [{
+            model: db.user,
+            attributes: {
+                exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
+            },
+                 }, ]
+    if(req.user){
+        console.log(req.user.id);
+        dbJoins.push({
+        model: db.vote,
+        attributes: ["vote"],
+        include:[{model:db.user, where:{id: req.user.id}, required:false, attributes:["id"]}]
+        })   
+    }else{
+        dbJoins.push(
+            {
+            model: db.vote,
+            attributes: ["vote"],
+        }   
+        ) 
+    }
+    
     db.image.findAll({
         limit: 30,
+        where:{privacy: "Public"},
         order: [["createdAt", "DESC"]],
         attributes: {
             exclude: ["fileDir", "id"]
         },
         offset: req.params.page * 30,
-        include: [{
-            model: db.user,
-            attributes: {
-                exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
-            }
-                 }]
+        include: dbJoins
     }).then(function (images) {
+        console.log(images[0].votes);
         if (images) {
             res.json(images);
         } else {
@@ -312,6 +367,7 @@ app.get("/api/recentimages/:page", function (req, res) {
 //then sends the image, does not send db record. 
 //later, this will also check for proper authentication if needed. 
 app.get("/getimage/:key", function (req, res) {
+console.log(typeof req.params.key);
     db.image.findOne({
         where: {
             key: req.params.key
@@ -366,51 +422,10 @@ app.get("/api/:fileId", function (req, res) {
 
     }).then(function (image) {
         if (image) {
-            db.vote.findAll({
-                where: {
-                    imageId: image.id
-                },
-                raw: true
-            }).then(function (votesarray) {
-                function votecounter(votesarray, index, storageobject) {
-                    if (typeof storageobject == "undefined") {
-                        storageobject = {};
-                        storageobject.upvote = 0;
-                        storageobject.downvote = 0;
-                    }
-                    if (votesarray[index].vote == 1) {
-                        storageobject.upvote++;
-                    } else if (votesarray[index].vote == -1) {
-                        storageobject.downvote--;
-                    }
-
-                    if (index < votesarray.length) {
-                        index++;
-                        if (index >= votesarray.length) {
-                            storageobject.score = storageobject.downvote + storageobject.upvote;
-                            console.log(storageobject);
-                            image.vote = storageobject;
-                            res.json(image);
-                        } else {
-                            process.nextTick(() => votecounter(votesarray, index, storageobject));
-                        }
-                    }
-                }
-                image = image.get({
-                    plain: true
-                });
-
-                if (votesarray.length > 0) {
-                    votecounter(votesarray, 0)
-                } else {
-                    var votecount = {};
-                    votecount.upvote = 0;
-                    votecount.downvote = 0;
-                    votecount.score = 0;
-                    image.vote = votecount;
-                    res.json(image);
-                }
-
+            db.vote.getImageScore(image.id).then(function(imagescore){
+                image = image.get({plain:true});
+                image.vote = imagescore;
+                res.json(image);
             })
 
         } else {
@@ -422,46 +437,10 @@ app.get("/api/:fileId", function (req, res) {
 })
 
 app.get("/api/getscore/:id", function (req, res) {
-    db.vote.findAll({
-        where: {
-            imageId: req.params.id
-        },
-        raw: true
-    }).then(function (votesarray) {
-                function votecounter(votesarray, index, storageobject) {
-                    if (typeof storageobject == "undefined") {
-                        storageobject = {};
-                        storageobject.upvote = 0;
-                        storageobject.downvote = 0;
-                    }
-                    if (votesarray[index].vote == 1) {
-                        storageobject.upvote++;
-                    } else if (votesarray[index].vote == -1) {
-                        storageobject.downvote--;
-                    }
-
-                    if (index < votesarray.length) {
-                        index++;
-                        if (index >= votesarray.length) {
-                            storageobject.score = storageobject.downvote + storageobject.upvote;
-                            console.log(storageobject);
-                            res.json(storageobject);
-                        } else {
-                            process.nextTick(() => votecounter(votesarray, index, storageobject));
-                        }
-                    }
-                }
-                if (votesarray.length > 0) {
-                    votecounter(votesarray, 0)
-                } else {
-                    var votecount = {};
-                    votecount.upvote = 0;
-                    votecount.downvote = 0;
-                    votecount.score = 0;
-                    console.log(votecount);
-                    res.json(votecount);
-                }
-    })
+    console.log(req.params.id)
+    db.vote.getImageScore(req.params.id).then(function(imagescore){
+        res.json(imagescore);  
+    });
 })
 
 
@@ -522,7 +501,9 @@ app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
 
     }).then(function (newvote) {
         if (newvote) {
-            res.status(200).send({servermsg: "All done."});
+            res.status(200).send({
+                servermsg: "All done."
+            });
             return;
         }
     })

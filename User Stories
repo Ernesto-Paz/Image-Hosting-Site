@@ -25,3 +25,7 @@ req.file object created by multer
 ToDo
 
 1. Remove userinfo from recentimages api call if not needed.
+
+2. Add file verification for images. JPG are {255,216,255,224}, .BMP are {66,77}, .GIF are {71,73,70,56}, .PNG are {137,80,78,71}
+
+3. Verify that params from users are strings in order to prevent injection attacks.

@@ -15,7 +15,7 @@ if(env === "production"){
     var sequelize = new                               
     Sequelize(process.env.DATABASE_URL, {
         dialect: "postgres",
-        logging: console.log 
+        logging: console.log
     });
     
 }

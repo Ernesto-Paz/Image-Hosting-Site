@@ -38,6 +38,7 @@ module.exports = function (sequelize, DataTypes) {
 
             hooks: {
                 beforeCreate: function (user, options, cb) {
+                    user.setDataValue("username", user.username.toLowerCase())
                     bcrypt.hash(user.password, 10, function (err, hash) {
                         user.setDataValue("passwordHash", hash);
                         return cb(null, user);
