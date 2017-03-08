@@ -3,13 +3,47 @@ import {Http, Response, Headers, RequestOptions} from '@angular/http';
 import { Observable }     from 'rxjs/Observable';
 
 @Injectable()
-export class GlobalHttpService {
+export class GlobalHttpService{
     
   public onImageSubmit = new EventEmitter();
     public onUserLogin = new EventEmitter();
     public isUserLoggedIn = false;
     public username = "default";
+    public adminLevel = null;
     public imagesArray = [];
+   
+
+
+public CheckSession(){   
+    console.log("ngInit http");
+    function processresponse(res){
+    console.log(res);
+    if(res.username !== null && res.adminLevel !== null){
+    this.isUserLoggedIn = true;
+    this.username = res.username;
+    this.adminLevel = res.adminLevel;
+    }
+}
+        
+    let xhr: XMLHttpRequest = new XMLHttpRequest();
+    xhr.open("GET","/api/checksession", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.onreadystatechange = function(){
+        if(xhr.readyState == 4 && xhr.status == 200){
+            console.log("Form Submission Callback");
+            let res = JSON.parse(xhr.response);
+            processresponse(res);
+        }else if(xhr.readyState == 4){
+            console.log("Form Submission Callback");
+            let res = JSON.parse(xhr.response);
+            processresponse(res);
+        }
+    }
+        xhr.send();
+        
+}
+    
+    
 public getImagesArray(): any[]{
     
     return this.imagesArray;
@@ -21,7 +55,7 @@ public getImagesArray(): any[]{
     public rooturl: string = "/api/";
     constructor (private http: Http) {
 
-}
+    }
 
 public getlast10(): Observable <any>{
             console.log("getlast10 called.");

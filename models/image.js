@@ -13,10 +13,16 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false
         },
         score: {
-            
         type:DataTypes.INTEGER,
         defaultValue: 0
-        
+        },
+        upvote:{
+        type:DataTypes.INTEGER,
+        defaultValue: 0
+        },
+        downvote:{
+        type: DataTypes.INTEGER,
+        defaultValue: 0
         },
         privacy: {
             

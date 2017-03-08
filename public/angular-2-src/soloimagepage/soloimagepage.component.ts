@@ -14,7 +14,10 @@ constructor(private router: Router, private route: ActivatedRoute, private globa
 }    
 public fileId: string = "";
 public image: any;
-
+public voting: boolean = false;
+public userVote: any = {up: null, down: null};
+public upvote: any = {vote: true};
+public downvote: any = {vote: false};
 ngOnInit(){
     console.log(this.route.params);
 this.route.params.forEach((params: Params)=>{
@@ -30,7 +33,9 @@ private getsingleimage(){
         (error) => console.log(error),
 () => {
     if(this.image){
-        console.log("Done getting image info"); console.log(this.image); this.image.url = "/getimage/" + this.image.key;
+    console.log(this.image);
+    this.updateArrow();
+        console.log("Done getting image info"); console.log(this.image);
         }
     else{
         
@@ -38,19 +43,57 @@ private getsingleimage(){
         
 }}
     );
-
+}
+    
+private updateArrow(){
+    console.log("Updating Arrow");
+    
+    if(this.image.uservote){
+                    if(this.image.uservote === 1){this.userVote.up = true; this.userVote.down = false} 
+                    else if(this.image.uservote === -1){this.userVote.up = false; this.userVote.down = true;}
+                    else if(this.image.uservote === 0){this.userVote.up = false; this.userVote.down = false;}
+                }
+    else{
+        this.userVote.up = false;
+        this.userVote.down = false;
+        }
+    
 }
     
 private vote(data: any){
     let imagekey = this.image.key;
-    this.globalhttp.postRequestObservable("/api/submitvote/" + imagekey ,data).subscribe(
+if(data === "upvotearrow"){
+data = {vote: true}; 
+    
+}else{
+data = {vote: false};
+
+    
+}
+    //check if user has already voted.
+    if(this.image.uservote){
+        if(data.vote === true && this.image.uservote === 1){ console.log("nulled up"); data.vote = null; }
+        else if(data.vote === false && this.image.uservote === -1){ console.log("nulled down"); data.vote = null; }
+    }
+    //check if voting is in progress
+    if(this.voting){
+    return;    
+    }
+    else{
+    this.voting = true;
+    }
+    
+    
+    this.globalhttp.postRequestObservable("/api/submitvote/" + imagekey , data).subscribe(
         (res) => {console.log("Got response!")}   ,
-        (error) => {console.log("got an error"); console.log(error);}  ,
+        (error) => {console.log("got an error"); console.log(error); this.voting = false;}  ,
         () => {
+        this.voting = false;
         console.log("Callback from vote post.")
-        this.globalhttp.sendRequest("/api/getscore/" + this.image.id, "GET", {}, (res) => {
+        this.globalhttp.sendRequest("/api/" + this.fileId, "GET", {}, (res) => {
         console.log(res);
-        this.image.vote = res;
+        this.image = res;
+        this.updateArrow();
         })
     
     

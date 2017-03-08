@@ -153,7 +153,7 @@ function authenticateUser(req, res, next) {
     }
 }
 
-function checkForSession(req, res, next){
+function checkForSession(req, res, next) {
     console.log("Check for Session Middleware")
     console.log(req.session);
     if (req.session) {
@@ -186,7 +186,119 @@ function checkForSession(req, res, next){
         return next();
 
     }
-    
+
+}
+
+function getImageScore(imageId, userId) {
+
+    return new Promise(function (resolve, reject) {
+        
+        if(userId){
+        var includes = [{
+                model: db.vote,
+                where: {
+                    userId: userId,
+                    imageId: imageId
+                },
+                attributes:{
+                include:["vote"]    
+                    
+                },
+                required: false
+            }];    
+            
+        }else{
+        var includes = [];    
+            
+        }
+
+        db.image.findOne({
+            where: {
+                id: imageId,
+            },
+            attributes:["score", "upvote", "downvote"],
+            include: includes
+        }).then(function(voteinfo){
+            if(voteinfo){
+                voteinfo.get({plain:true});                
+                console.log(voteinfo);
+                voteinfo.uservote = voteinfo.votes.vote;
+                delete voteinfo.vote;
+                resolve (voteinfo);
+            }
+            else{
+                reject({score: 0, upvote: 0, downvote: 0});
+            
+                
+            }
+            
+        })
+
+
+
+        /*    var includes = [];
+            if (userId) {
+                includes = [{
+                    model: db.user,
+                    where: {
+                        id: userId
+                    },
+                    required: false,
+                    attributes: ["id"]
+                }]
+            }
+            db.vote.findAll({
+                where: {
+                    imageId: imageId
+                },
+                include: includes,
+                raw: true
+            }).then(function (votesarray) {
+
+                function votecounter(votesarray, index, storageobject) {
+                    if (typeof storageobject == "undefined") {
+                        storageobject = {};
+                        storageobject.upvote = 0;
+                        storageobject.downvote = 0;
+                    }
+                    if (votesarray[index]["user.id"] !== null) {
+                        storageobject.uservote = votesarray[index].vote
+                    }
+                    if (votesarray[index].vote == 1) {
+                        storageobject.upvote++;
+                    } else if (votesarray[index].vote == -1) {
+                        storageobject.downvote--;
+                    }
+
+                    if (index < votesarray.length) {
+                        index++;
+                        if (index >= votesarray.length) {
+                            storageobject.score = storageobject.downvote + storageobject.upvote;
+                            console.log(storageobject);
+                            resolve(storageobject);
+                        } else {
+                            if (index % 5 === 0) {
+                                process.nextTick(() => votecounter(votesarray, index, storageobject));
+                            } else {
+                                votecounter(votesarray, index, storageobject);
+                            }
+                        }
+                    }
+                }
+                if (votesarray.length > 0) {
+                    votecounter(votesarray, 0);
+                } else {
+                    var votecount = {};
+                    votecount.upvote = 0;
+                    votecount.downvote = 0;
+                    votecount.score = 0;
+                    console.log(votecount);
+                    resolve(votecount);
+                }
+            })*/
+
+    });
+
 }
 
 
@@ -314,39 +426,28 @@ app.get("/api/recentimages/:page", checkForSession, function (req, res) {
         req.params.page = 0;
     }
     console.log("Recent images " + req.params.page + ".");
-    var dbJoins = [{
-            model: db.user,
-            attributes: {
-                exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
-            },
-                 }, ]
-    if(req.user){
-        console.log(req.user.id);
-        dbJoins.push({
-        model: db.vote,
-        attributes: ["vote"],
-        include:[{model:db.user, where:{id: req.user.id}, required:false, attributes:["id"]}]
-        })   
-    }else{
-        dbJoins.push(
-            {
-            model: db.vote,
-            attributes: ["vote"],
-        }   
-        ) 
-    }
-    
+
     db.image.findAll({
         limit: 30,
-        where:{privacy: "Public"},
+        where: {
+            privacy: "Public"
+        },
         order: [["createdAt", "DESC"]],
         attributes: {
             exclude: ["fileDir", "id"]
         },
         offset: req.params.page * 30,
-        include: dbJoins
+        /*include: [{
+        model: db.user,
+        attributes: {
+            exclude: ["passwordHash", "id", "createdAt", "updatedAt"]
+        },
+                 }, {
+            model: db.vote,
+            attributes: ["vote"],
+        }]*/
     }).then(function (images) {
-        console.log(images[0].votes);
+
         if (images) {
             res.json(images);
         } else {
@@ -367,7 +468,6 @@ app.get("/api/recentimages/:page", checkForSession, function (req, res) {
 //then sends the image, does not send db record. 
 //later, this will also check for proper authentication if needed. 
 app.get("/getimage/:key", function (req, res) {
-console.log(typeof req.params.key);
     db.image.findOne({
         where: {
             key: req.params.key
@@ -405,7 +505,8 @@ console.log(typeof req.params.key);
 
 
 //looks up information for a single image and sends db record to frontend. Needs to be updated.
-app.get("/api/:fileId", function (req, res) {
+app.get("/api/:fileId", checkForSession, function (req, res) {   
+    
     db.image.findOne({
         where: {
             fileId: req.params.fileId
@@ -421,12 +522,29 @@ app.get("/api/:fileId", function (req, res) {
                  }]
 
     }).then(function (image) {
-        if (image) {
-            db.vote.getImageScore(image.id).then(function(imagescore){
-                image = image.get({plain:true});
-                image.vote = imagescore;
+        if(req.user && image){
+        db.vote.findOne({where:{imageId: image.id, userId: req.user.id}, attributes:{include:["vote"]}}).then(function(foundvote){
+            if(foundvote){
+            image = image.get({plain:true});
+            image.uservote = foundvote.vote;
+            image.url = "/getimage/" + image.key;
+            res.json(image);   
+            }
+            else{
+            image = image.get({plain:true});
+            image.url = "/getimage/" + image.key;
+            res.json(image); 
+            }
+        })    
+            
+            
+        }
+        else if (image) {
+                image = image.get({
+                    plain: true
+                });
+                image.url = "/getimage/" + image.key;
                 res.json(image);
-            })
 
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.fileId);
@@ -436,17 +554,38 @@ app.get("/api/:fileId", function (req, res) {
     })
 })
 
-app.get("/api/getscore/:id", function (req, res) {
+app.get("/api/getscore/:id", checkForSession, function (req, res) {
     console.log(req.params.id)
-    db.vote.getImageScore(req.params.id).then(function(imagescore){
-        res.json(imagescore);  
-    });
+    if (req.user) {
+        getImageScore(req.params.id, req.user.id).then(function (imagescore) {
+            res.json(imagescore);
+        })
+    } else {
+        getImageScore(req.params.id).then(function (imagescore) {
+            res.json(imagescore);
+        });
+    }
 })
 
+app.get("/api/user/checksession/", checkForSession, function (req, res) {
+        //will return user info to front end or userobject with a lot of nulls.
+        if (req.user) {
+            res.json({
+                username: req.user.username,
+                adminLevel: req.user.adminLevel
+            });
+        } else {
+            res.json({
+                username: null,
+                adminLeveL: null
+            });
+        }
 
-//This api call will submit both positive and negative votes. It will not take an integer, it will take a boolean. This avoids issues with people sending integers and stuff.
+
+    })
+    //This api call will submit both positive and negative votes. It will not take an integer, it will take a boolean. This avoids issues with people sending integers and stuff.
 app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
-
+    console.log(req.body.vote);
     if (req.body.vote === true) {
         req.body.vote = 1
     } else if (req.body.vote === false) {
@@ -459,54 +598,118 @@ app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
 
 
     db.image.findOne({
-        where: {
-            key: req.params.key
-        }
-    }).then(function (image) {
-        if (!image) {
-            res.status(400);
-            res.send("Bad Request : No such image.");
-            return;
-        } else {
-            req.image = image;
-            return db.vote.findOne({
-                where: {
-                    imageId: req.image.id,
-                    userId: req.user.id
-                }
-            });
-
-        }
-
-
-    }).then(function (voterecord) {
-        if (!voterecord) {
-            return db.vote.create({
-                userId: req.user.id,
-                imageId: req.image.id,
-                vote: req.body.vote
-            });
-        } else {
-            if (voterecord.vote !== req.body.vote) {
-                return voterecord.update({
-                    vote: req.body.vote
-                });
-            } else {
-                res.status(400).send("Bad Request: No change in vote.");
-                return;
+            where: {
+                key: req.params.key
             }
-        }
+        }).then(function (image) {
+            if (!image) {
+                res.status(400);
+                res.send("Bad Request : No such image.");
+                return;
+            } else {
+                req.image = image;
+                return db.vote.findOne({
+                    where: {
+                        imageId: req.image.id,
+                        userId: req.user.id
+                    }
+                });
+
+            }
+
+
+        }).then(function (voterecord) {
+            if (!voterecord) {
+                //no vote record, create new vote record change image to match.
+                db.vote.create({
+                    userId: req.user.id,
+                    imageId: req.image.id,
+                    vote: req.body.vote
+                }).then(function (newvote) {
+                    if (newvote.vote === 1) {
+                        req.image.increment({
+                            upvote: 1,
+                            score: 1
+                        });
+                    } else if (newvote.vote === -1) {
+                        req.image.increment({
+                            downvote: 1,
+                            score: -1
+                        });
+                    }
+                    res.status(200).send({
+                        servermsg: "All done."
+                    });
+                    return;
+                })
+            } else { //else vote record found.
+                if (voterecord.vote !== req.body.vote) {
+                    //vote record doesn't match user submitted vote, change record in both vote and image.
+                    var oldvote = voterecord.vote;
+                    voterecord.update({
+                        vote: req.body.vote
+                    }).then(function (updatedvote) {
+
+                        //undo the old vote
+                        if (updatedvote) {
+                            if (oldvote === 1) {
+
+                                req.image.increment({
+                                    upvote: -1,
+                                    score: -1
+                                });
+                            } else if (oldvote === -1) {
+
+                                req.image.increment({
+                                    downvote: -1,
+                                    score: 1
+                                });
+
+                            }
+                            //then update with the new vote.
+                            if (updatedvote.vote === 1) {
+
+                                req.image.increment({
+                                    upvote: 1,
+                                    score: 1
+                                });
+
+                            }
+
+                            if (updatedvote.vote === -1) {
+
+                                req.image.increment({
+                                    downvote: 1,
+                                    score: -1
+                                });
+
+                            }
+                        }
+
+                        res.status(200).send({
+                            servermsg: "All done."
+                        })
+
+                    })
+                } else {
+                    res.status(400).send("Bad Request: No change in vote.");
+                    return;
+                }
+            }
 
 
 
-    }).then(function (newvote) {
-        if (newvote) {
-            res.status(200).send({
-                servermsg: "All done."
-            });
-            return;
-        }
-    })
+        })
+        /*.then(function (newvote) {
+                if (newvote) {
+                    //modify image entry to match vote changes
+                    
+                    res.status(200).send({
+                        servermsg: "All done."
+                    });
+                    return;
+                }
+            })*/
 
 });
 
@@ -529,6 +732,22 @@ app.use(function (req, res, next) {
 
 db.sequelize.sync({}).then(function () {
     console.log("DB Ready")
+        /*
+            var entry = {
+            vote: 1,
+            userId:1,
+            imageId:3 
+            }
+            var array = [];
+            for(i=0;i<1000;i++){
+            if(Math.random() < .4){entry.vote = 1;}
+            else{entry.vote = -1;}
+            array.push(entry);  
+            }
+            
+            db.vote.bulkCreate(array).then(function(entries){console.log("DB filled.")});
+            */
+
 });
 
 

@@ -5,7 +5,8 @@
     "database": null,
     "storage": "./dbconfig/data/dev-todo-api.sqlite",
     "host": "127.0.0.1",
-    "dialect": "sqlite"
+    "dialect": "sqlite",
+    "logging": false
   },
   "test": {
     "username": "root",
