@@ -10,7 +10,7 @@ export class ImgThumbnailComponent implements OnInit{
 @Input() image: any;
 
 ngOnInit(){
-    this.image.url = "/getimage/" + this.image.key;
+    this.image.url = "/getimage/" + this.image.thumbnailKey;
 }
     
 }

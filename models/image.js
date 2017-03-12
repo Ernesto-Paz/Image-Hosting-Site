@@ -12,6 +12,11 @@ module.exports = function (sequelize, DataTypes) {
             type:DataTypes.STRING, 
             allowNull: false
         },
+        thumbnailKey:{
+           type:DataTypes.STRING,
+            allowNull:false
+            
+        },
         score: {
         type:DataTypes.INTEGER,
         defaultValue: 0

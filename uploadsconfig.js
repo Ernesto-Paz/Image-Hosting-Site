@@ -1,5 +1,6 @@
 var multer = require('multer');
 var multerS3 = require('multer-s3');
+var s3StorageEngine = require("./s3StorageEngine.js")
 var aws = require ('aws-sdk');
 //configuring S3 for launch.
 var fs = require ('fs');
@@ -27,7 +28,7 @@ var fs = require('fs');
 var path = require('path');
 
 
-//outdated chunk of code was used during prototyping when image storage was local.
+/*//outdated chunk of code was used during prototyping when image storage was local.
 var id = 10000;
 newdir = __dirname + "/uploads/";
 fs.mkdir(newdir, (err) => {
@@ -42,7 +43,8 @@ fs.mkdir(newdir, (err) => {
     }else {
         console.log("Created upload directory successfully. No errors.");
     }
-});
+});*/
+
 // this id is local to this file and is only for naming purposes, in production it will be saved and loaded on server start up ensuring every image has a unique id.
 
 function removebase64padding(fileId) {
@@ -60,32 +62,18 @@ function removebase64padding(fileId) {
 image id number. The URL plus the file extension gives us the file name of the uploaded file on the server. For
 example localhost:3000/newimage/newimage.jpg */
 
-var storage = multerS3({
-   /* destination: function (req, file, cb) {
-        console.log(req.body);
-        console.log(file);
-        if (file && req.body) {
-            console.log(id);
-            req.imgid = id;
-            id++;
-        }
-        //todo: condense these two req.imagename into a single function that returns the trimmed fileId.
-        req.newdir = newdir;
-        req.imagename = Buffer.from(req.imgid.toString()).toString('base64');
-        req.imagename = removebase64padding(req.imagename);
-        cb(null, req.newdir);
-    },*/
+var storage = s3StorageEngine({
     s3: s3,
     bucket:"bucketofimageswithfries",
     
     //in converting to s3 this key function should return the key for the file in the bucket. Ideally usning Date.now() to avoid duplicates.
-    key: function (req, file, cb) {
+    /*key: function (req, file, cb) {
         fileextension = path.extname(file.originalname);
         //currently using Data.now in order to generate unique ids for images, look for a better method.
         req.fileId = removebase64padding(Buffer.from(Date.now().toString()).toString('base64'))
         req.filename = req.fileId + fileextension;
         cb(null, req.filename);
-    }
+    }*/
 });
 
 /*
@@ -115,7 +103,17 @@ var albumstorage = multer.diskStorage({
 });
 
 exports.singleupload = multer({
-    storage: storage
+    storage: storage,
+    fileFilter: function(req, file, cb){
+        console.log(file);
+        if(file.mimetype === "image/gif" || file.mimetype === "image/jpeg" || file.mimetype === "image/gif" || file.mimetype === "image/png"){
+        return cb(null,true);
+        }else{
+            return cb(null, false);
+        }
+    
+    
+    }
 });
 exports.albumupload = multer({
     storage: albumstorage

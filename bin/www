@@ -5,10 +5,12 @@
  */
 
 var app = require('../app');
+var globalvars = require("../globalvars")
 var debug = require('debug')('Image-Hosting-Site:server');
 var http = require('http');
 //need to switch to https later for secure connections. Its not good to send user info over plain text.
 var https = require('https');
+var db = require("../models/index.js");
 
 /**
  * Get port from environment and store in Express.
@@ -16,38 +18,74 @@ var https = require('https');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.locals.port = port
+
 /**
  * Create HTTP server.
  */
-
+var charset = ["b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z", "B", "C", "D", "F", "G", "H", "J", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "$", "-", "+", "*", "_", "!", "(", ")"]
 var server = http.createServer(app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+//prepare variables
+db.image.max("id").then(function (id) {
+    //setting global variables here.
+    if (!id) {
+        globalvars.currentImageId = 0;
+    } else {
+        db.image.findOne({where:{id:id}}).then(function(image){
+            
+            //id to start at for creating image keys.
+        function converttobase10(int) {
+            int = int.split("");
+            int = int.reverse();
+            output = 0;
+            for (i = 0; i < int.length; i++) {
+                index = charset.indexOf(int[i]);
+                index = index * (Math.pow(60, i))
+                output += index;
+            }
+            return output;
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+        }
+        console.log(image);
+        globalvars.currentImageId = converttobase10(image.fileId) + 1;
+            
+            
+            
+        })
+        
+    }
+    globalvars.check = "Its Global!"
+
+    /**
+     * Listen on provided port, on all network interfaces.
+     */
+    //requests start being accepted here.
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+
+});
+
+
 
 /**
  * Normalize a port into a number, string, or false.
  */
 
 function normalizePort(val) {
-  var port = parseInt(val, 10);
+    var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+    if (port >= 0) {
+        // port number
+        return port;
+    }
 
-  return false;
+    return false;
 }
 
 /**
@@ -55,27 +93,25 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+    var bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
+        console.error(bind + ' requires elevated privileges');
+        process.exit(1);
+        break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
+        console.error(bind + ' is already in use');
+        process.exit(1);
+        break;
     default:
-      throw error;
-  }
+        throw error;
+    }
 }
 
 /**
@@ -83,7 +119,7 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+    var addr = server.address();
+    var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    debug('Listening on ' + bind);
 }

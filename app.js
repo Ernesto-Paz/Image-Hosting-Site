@@ -128,7 +128,6 @@ function authenticateUser(req, res, next) {
             if (session) {
                 console.log("Valid Session Found!");
                 req.user = session.user;
-                res.status(200);
                 return next();
             } else {
                 console.log("Invalid Session!");
@@ -142,7 +141,6 @@ function authenticateUser(req, res, next) {
             res.send();
             return;
         });
-        return;
     } else {
         //no session, user not authenticated. Error 401 Unauthorized.
         console.log("No session found.")
@@ -372,13 +370,19 @@ app.post('/api/uploadnewimage', authenticateUser, upload.single('image'), functi
     if (!req.user) {
         req.user.userId == null;
     }
-
+    console.log(req.file);
+    if(!req.file){
+    console.log("No req.file")
+    res.end();
+    return;
+    }
     if (req.file.key && req.file) {
         console.log("creating new image in db");
         db.image.create({
                 title: req.body.title,
                 key: req.file.key,
-                fileId: req.fileId,
+                fileId: req.file.fileId,
+                thumbnailKey: req.file.thumbnailKey,
                 userId: req.user.id
             })
             .then(function (image) {
@@ -470,12 +474,19 @@ app.get("/api/recentimages/:page", checkForSession, function (req, res) {
 app.get("/getimage/:key", function (req, res) {
     db.image.findOne({
         where: {
-            key: req.params.key
+            $or:[{key: req.params.key}, {thumbnailKey: req.params.key}]
+            
         }
     }).then(function (image) {
+        
         if (image) {
+            var requestedImage = image.key
+            if(req.params.key.indexOf("small-") !== -1 ){
+                requestedImage = image.thumbnailKey
+            
+            }
             s3.getObject({
-                    Key: image.key,
+                    Key: requestedImage,
                     Bucket: "bucketofimageswithfries"
                 }, function (err, data) {
                     if (err) {
@@ -730,9 +741,10 @@ app.use(function (req, res, next) {
     next(err);
 });
 
+//creates missing tables does not drop old tables unless you run force:true
 db.sequelize.sync({}).then(function () {
     console.log("DB Ready")
-        /*
+        /* bulkcreate to fill db for testing if needed
             var entry = {
             vote: 1,
             userId:1,
@@ -747,7 +759,6 @@ db.sequelize.sync({}).then(function () {
             
             db.vote.bulkCreate(array).then(function(entries){console.log("DB filled.")});
             */
-
 });
 
 
