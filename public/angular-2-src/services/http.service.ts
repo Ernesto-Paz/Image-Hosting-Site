@@ -14,19 +14,20 @@ export class GlobalHttpService{
    
 
 
-public CheckSession(){   
+public checkSession(){   
     console.log("ngInit http");
+    var that = this
     function processresponse(res){
     console.log(res);
     if(res.username !== null && res.adminLevel !== null){
-    this.isUserLoggedIn = true;
-    this.username = res.username;
-    this.adminLevel = res.adminLevel;
+    that.isUserLoggedIn = true;
+    that.username = res.username;
+    that.adminLevel = res.adminLevel;
     }
 }
         
     let xhr: XMLHttpRequest = new XMLHttpRequest();
-    xhr.open("GET","/api/checksession", true);
+    xhr.open("GET","/api/user/checksession", true);
     xhr.setRequestHeader("Content-Type", "application/json");
     xhr.onreadystatechange = function(){
         if(xhr.readyState == 4 && xhr.status == 200){

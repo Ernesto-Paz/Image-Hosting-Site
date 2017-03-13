@@ -82,6 +82,7 @@ function MyCustomStorage(opts) {
     this.getBucket = opts.bucket;
     this.getWhitelist = (opts.whitelist || defaultWhitelist);
     this.getContentType = (opts.contentType || getContentType);
+    this.fileObject = {};
 }
 
 MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
@@ -101,7 +102,6 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
     var results = [];
     var counter = 0;
     var completedUploads = 0;
-    var fileObject = {};
 
     function finishUpload(fileInfo){
     completedUploads++;
@@ -126,10 +126,10 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
                 console.log(results);
 
                 //build fileobject for delivery to route.
-                fileObject.fileId = results[1]
-                fileObject.key = results[1] + path.extname(file.originalname);
-                fileObject.thumbnailKey = "small-" + fileObject.key;
-                fileObject.contentType = results[0].mime;
+                that.fileObject.fileId = results[1]
+                that.fileObject.key = results[1] + path.extname(file.originalname);
+                that.fileObject.thumbnailKey = "small-" + that.fileObject.key;
+                that.fileObject.contentType = results[0].mime;
 
                 //all params fetched need two s3.upload one for thumbnail and one for main image.
 
@@ -141,28 +141,28 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
                     console.log(stderr)
                     var params = {
                         Bucket: that.getBucket,
-                        Key: "small-" + fileObject.key,
+                        Key: "small-" + that.fileObject.key,
                         Body: stdout,
-                        ContentType: fileObject.contentType,
+                        ContentType: that.fileObject.contentType,
                     };
                     that.s3.upload(params, function (err, data) {
                         console.log("WE DID IT! SMALL!")
                         console.log("Error", err);
-                        finishUpload(fileObject);
+                        finishUpload(that.fileObject);
                     });
 
 
                 })
                 var params = {
                     Bucket: that.getBucket,
-                    Key: fileObject.key,
+                    Key: that.fileObject.key,
                     Body: file.stream,
-                    ContentType: fileObject.contentType,
+                    ContentType: that.fileObject.contentType,
                 };
                 that.s3.upload(params, function (err, data) {
                     console.log("WE DID IT!")
                     console.log("Error", err);
-                    finishUpload(fileObject);
+                    finishUpload(that.fileObject);
                 });
                 
 
@@ -203,9 +203,18 @@ MyCustomStorage.prototype._handleFile = function _handleFile(req, file, cb) {
 
 MyCustomStorage.prototype._removeFile = function _removeFile(req, file, cb) {
     this.s3.deleteObject({
-        Bucket: file.bucket,
-        Key: file.key
-    }, cb)
+        Bucket: this.getBucket,
+        Key: this.fileObject.key
+    }, function(err, data){
+        console.log("Image delete.")
+    });
+        this.s3.deleteObject({
+        Bucket: this.getBucket,
+        Key: this.fileObject.thumbnailKey
+    }, function(err, data){
+            console.log("Small image delete.")
+        });
+    cb();
 }
 
 module.exports = function (opts) {

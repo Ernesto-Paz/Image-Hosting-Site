@@ -1,4 +1,4 @@
-import { Component, Input, OnInit} from "@angular/core";
+import { Component, Input, OnInit, OnDestroy} from "@angular/core";
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { GlobalHttpService } from "../services/http.service";
 
@@ -18,13 +18,19 @@ public voting: boolean = false;
 public userVote: any = {up: null, down: null};
 public upvote: any = {vote: true};
 public downvote: any = {vote: false};
+public params: any;
 ngOnInit(){
     console.log(this.route.params);
-this.route.params.forEach((params: Params)=>{
+this.params = this.route.params.subscribe((params: Params)=>{
     this.fileId = params["id"];
     console.log(this.fileId);
     });
     this.getsingleimage();
+}
+    
+ngOnDestroy(){
+    this.params.unsubscribe();
+    
 }
 
 private getsingleimage(){

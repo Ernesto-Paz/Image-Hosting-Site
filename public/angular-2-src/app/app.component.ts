@@ -1,4 +1,5 @@
 import { Component } from "@angular/core";
+import {GlobalHttpService} from "../services/http.service";
 
     @Component ({
         moduleId: module.id,
@@ -7,6 +8,10 @@ import { Component } from "@angular/core";
         })
 
 export class AppComponent {
-constructor(){}
+constructor(private globalhttp: GlobalHttpService){
+    this.globalhttp.checkSession();   
+    
+    
+}
 
 }

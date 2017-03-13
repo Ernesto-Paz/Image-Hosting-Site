@@ -19,7 +19,7 @@
             <li *ngIf="globalhttp.isUserLoggedIn == false" (click)="userregistrationmodal.toggleModal()" ><a>Register</a></li>
             <li *ngIf="globalhttp.isUserLoggedIn == false" (click)="userloginmodal.toggleModal()"><a>Login</a></li>
             <li *ngIf="globalhttp.isUserLoggedIn == true">
-            <a>{{globalhttp.username}}</a>
+            <a routerLink="/user/{{globalhttp.username}}" routerLinkActive="active" >{{globalhttp.username}}</a>
             </li>
         </ul>
     </div>

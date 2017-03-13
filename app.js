@@ -190,46 +190,51 @@ function checkForSession(req, res, next) {
 function getImageScore(imageId, userId) {
 
     return new Promise(function (resolve, reject) {
-        
-        if(userId){
-        var includes = [{
+
+        if (userId) {
+            var includes = [{
                 model: db.vote,
                 where: {
                     userId: userId,
                     imageId: imageId
                 },
-                attributes:{
-                include:["vote"]    
-                    
+                attributes: {
+                    include: ["vote"]
+
                 },
                 required: false
-            }];    
-            
-        }else{
-        var includes = [];    
-            
+            }];
+
+        } else {
+            var includes = [];
+
         }
 
         db.image.findOne({
             where: {
                 id: imageId,
             },
-            attributes:["score", "upvote", "downvote"],
+            attributes: ["score", "upvote", "downvote"],
             include: includes
-        }).then(function(voteinfo){
-            if(voteinfo){
-                voteinfo.get({plain:true});                
+        }).then(function (voteinfo) {
+            if (voteinfo) {
+                voteinfo.get({
+                    plain: true
+                });
                 console.log(voteinfo);
                 voteinfo.uservote = voteinfo.votes.vote;
                 delete voteinfo.vote;
-                resolve (voteinfo);
+                resolve(voteinfo);
+            } else {
+                reject({
+                    score: 0,
+                    upvote: 0,
+                    downvote: 0
+                });
+
+
             }
-            else{
-                reject({score: 0, upvote: 0, downvote: 0});
-            
-                
-            }
-            
+
         })
 
 
@@ -367,14 +372,15 @@ app.post("/users/login", upload.none(), function (req, res) {
 //Upload routes, will be moved to new router later
 //for uploads multer stores the folder in req.imagefolder, the full directory in req.newdir, the url is stored in req.imgurl. Uploads to Amazon S3.
 app.post('/api/uploadnewimage', authenticateUser, upload.single('image'), function (req, res) {
+    var upload = upload.single("image")
     if (!req.user) {
         req.user.userId == null;
     }
     console.log(req.file);
-    if(!req.file){
-    console.log("No req.file")
-    res.end();
-    return;
+    if (!req.file) {
+        console.log("No req.file")
+        res.end();
+        return;
     }
     if (req.file.key && req.file) {
         console.log("creating new image in db");
@@ -401,7 +407,7 @@ app.post('/api/uploadnewimage', authenticateUser, upload.single('image'), functi
 });
 
 
-//returns an array of the last ten images used for debugging only atm can remove if need be.
+// CURRENTLY UNUSED. returns an array of the last ten images used for debugging only atm can remove if need be.
 app.get("/api/last10images", function (req, res) {
     db.image.findAll({
         limit: 10,
@@ -438,7 +444,7 @@ app.get("/api/recentimages/:page", checkForSession, function (req, res) {
         },
         order: [["createdAt", "DESC"]],
         attributes: {
-            exclude: ["fileDir", "id"]
+            exclude: ["fileDir", "id", "userId", "updatedAt"]
         },
         offset: req.params.page * 30,
         /*include: [{
@@ -474,16 +480,20 @@ app.get("/api/recentimages/:page", checkForSession, function (req, res) {
 app.get("/getimage/:key", function (req, res) {
     db.image.findOne({
         where: {
-            $or:[{key: req.params.key}, {thumbnailKey: req.params.key}]
-            
+            $or: [{
+                key: req.params.key
+            }, {
+                thumbnailKey: req.params.key
+            }]
+
         }
     }).then(function (image) {
-        
+
         if (image) {
             var requestedImage = image.key
-            if(req.params.key.indexOf("small-") !== -1 ){
+            if (req.params.key.indexOf("small-") !== -1) {
                 requestedImage = image.thumbnailKey
-            
+
             }
             s3.getObject({
                     Key: requestedImage,
@@ -516,14 +526,14 @@ app.get("/getimage/:key", function (req, res) {
 
 
 //looks up information for a single image and sends db record to frontend. Needs to be updated.
-app.get("/api/:fileId", checkForSession, function (req, res) {   
-    
+app.get("/api/:fileId", checkForSession, function (req, res) {
+
     db.image.findOne({
         where: {
             fileId: req.params.fileId
         },
         attributes: {
-            exclude: ["userId", "privacy", "createdAt", "updatedAt"]
+            exclude: ["id", "userId", "privacy", "createdAt", "updatedAt"]
         },
         include: [{
             model: db.user,
@@ -533,29 +543,39 @@ app.get("/api/:fileId", checkForSession, function (req, res) {
                  }]
 
     }).then(function (image) {
-        if(req.user && image){
-        db.vote.findOne({where:{imageId: image.id, userId: req.user.id}, attributes:{include:["vote"]}}).then(function(foundvote){
-            if(foundvote){
-            image = image.get({plain:true});
-            image.uservote = foundvote.vote;
+        if (req.user && image) {
+            db.vote.findOne({
+                where: {
+                    imageId: image.id,
+                    userId: req.user.id
+                },
+                attributes: {
+                    include: ["vote"]
+                }
+            }).then(function (foundvote) {
+                if (foundvote) {
+                    image = image.get({
+                        plain: true
+                    });
+                    image.uservote = foundvote.vote;
+                    image.url = "/getimage/" + image.key;
+                    res.json(image);
+                } else {
+                    image = image.get({
+                        plain: true
+                    });
+                    image.url = "/getimage/" + image.key;
+                    res.json(image);
+                }
+            })
+
+
+        } else if (image) {
+            image = image.get({
+                plain: true
+            });
             image.url = "/getimage/" + image.key;
-            res.json(image);   
-            }
-            else{
-            image = image.get({plain:true});
-            image.url = "/getimage/" + image.key;
-            res.json(image); 
-            }
-        })    
-            
-            
-        }
-        else if (image) {
-                image = image.get({
-                    plain: true
-                });
-                image.url = "/getimage/" + image.key;
-                res.json(image);
+            res.json(image);
 
         } else {
             let error = new Error("No Image Found in DB with imagename" + req.params.fileId);
@@ -579,18 +599,60 @@ app.get("/api/getscore/:id", checkForSession, function (req, res) {
 })
 
 app.get("/api/user/checksession/", checkForSession, function (req, res) {
-        //will return user info to front end or userobject with a lot of nulls.
+    //will return user info to front end or userobject with a lot of nulls.
+    if (req.user) {
+        res.json({
+            username: req.user.username,
+            adminLevel: req.user.adminLevel
+        });
+    } else {
+        res.json({
+            username: null,
+            adminLeveL: null
+        });
+    }
+})
+
+//get all images relating to user for display on users profile under submitted images or if viewed by another user or an unauthenticated user, only display public images.
+app.get("/api/user/:username", checkForSession, function (req, res) {
         if (req.user) {
-            res.json({
-                username: req.user.username,
-                adminLevel: req.user.adminLevel
-            });
-        } else {
-            res.json({
-                username: null,
-                adminLeveL: null
-            });
+            if (req.user.username === req.params.username) {
+
+                //send data including private images.
+                db.users.findOne({
+                    where: {
+                        username: req.params.username
+                    },
+                    include: [{
+                        model: db.images
+                    }]
+                }).then(function(userInfo){
+                    if(!userInfo){
+                        res.status(404);
+                        res.send("No user found with that username.");
+                    }
+                    else{
+                        
+                        
+                    res.status(200).send(userInfo);
+                        
+                        
+                    }
+                    
+                    
+                })
+
+            } else {
+
+                //send only Public Albums and Public Images.
+
+
+            }
+
+
         }
+
+
 
 
     })

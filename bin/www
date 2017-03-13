@@ -46,7 +46,7 @@ db.image.max("id").then(function (id) {
             return output;
 
         }
-        console.log(image);
+        //currentImageId globalvar is used in the s3StorageEngine in order to generate unique keys for newly uploaded images. Must be set on server start up.
         globalvars.currentImageId = converttobase10(image.fileId) + 1;
             
             
