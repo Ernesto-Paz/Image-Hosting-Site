@@ -61,6 +61,20 @@ else{
     //this.globalhttp.postsingleimage()
 }
     
+logout(){
+this.globalhttp.sendRequest("/users/logout", "POST", {}, (res)=>{
+        
+        //handle logout. Update variables which will update the view.
+        
+        this.globalhttp.isUserLoggedIn = false;
+        this.globalhttp.username = "default";
+        this.globalhttp.adminLevel = null;
+        
+        })    
+    
+    
+}
+    
 get diagnostic() { return JSON.stringify(this.upload); }
     
 }

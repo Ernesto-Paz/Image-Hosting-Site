@@ -19,4 +19,6 @@ constructor(private globalhttp: GlobalHttpService){
 }
     
     
+    
+    
 }

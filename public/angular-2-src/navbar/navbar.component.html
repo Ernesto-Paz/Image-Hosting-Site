@@ -19,7 +19,12 @@
             <li *ngIf="globalhttp.isUserLoggedIn == false" (click)="userregistrationmodal.toggleModal()" ><a>Register</a></li>
             <li *ngIf="globalhttp.isUserLoggedIn == false" (click)="userloginmodal.toggleModal()"><a>Login</a></li>
             <li *ngIf="globalhttp.isUserLoggedIn == true">
-            <a routerLink="/user/{{globalhttp.username}}" routerLinkActive="active" >{{globalhttp.username}}</a>
+                    <a class = "dropdown-toggle" data-toggle="dropdown">{{globalhttp.username}}<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a routerLink="/user/{{globalhttp.username}}" routerLinkActive="active" >Profile</a></li>
+                        <li (click)="userloginmodal.logout()"><a>Logout</a></li>
+                    </ul>
+                    
             </li>
         </ul>
     </div>

@@ -113,7 +113,7 @@ function objectHasProp(obj, prop) {
 //This middleware check for a session cookie, if found it adds a session and user info to req.user. 
 //Its used in routes that need user authentication to make user information available to them and to verify that the user is authenticated.
 function authenticateUser(req, res, next) {
-    console.log("Authenticate User Middleware")
+    console.log("Authenticate User Middleware");
     console.log(req.session);
     if (req.session) {
         //check session db and return associated user if found.
@@ -152,7 +152,7 @@ function authenticateUser(req, res, next) {
 }
 
 function checkForSession(req, res, next) {
-    console.log("Check for Session Middleware")
+    console.log("Check for Session Middleware");
     console.log(req.session);
     if (req.session) {
         //check session db and return associated user if found.
@@ -317,10 +317,10 @@ app.post("/users/registernewuser", upload.none(), function (req, res) {
             username: req.body.username,
             password: req.body.password
         }).then(function (user) {
-            res.send("Success");
+            res.send({servermsg:"Success"});
         }, function (err) {
             console.log(err);
-            res.send("Failed to create new user.");
+            res.send({servermsg:"Error"});
         })
 
     }
@@ -366,7 +366,23 @@ app.post("/users/login", upload.none(), function (req, res) {
 
 
     }
-})
+});
+
+//Logs out users
+app.post("/users/logout", upload.none(), authenticateUser ,function(req, res){
+    //logout users here.
+    db.session.findOne({where: {userId: req.user.id}}).then(function(session){
+        
+        return session.destroy();
+        
+    }).then(function(){
+        req.session = null;
+        res.status(200).end();
+    })
+    
+    
+    
+});
 
 
 //Upload routes, will be moved to new router later
@@ -615,24 +631,28 @@ app.get("/api/user/checksession/", checkForSession, function (req, res) {
 
 //get all images relating to user for display on users profile under submitted images or if viewed by another user or an unauthenticated user, only display public images.
 app.get("/api/user/:username", checkForSession, function (req, res) {
+        console.log(req.user.username);
+        console.log(req.params.username);
         if (req.user) {
             if (req.user.username === req.params.username) {
-
                 //send data including private images.
-                db.users.findOne({
+                db.user.findOne({
                     where: {
-                        username: req.params.username
+                        username: req.params.username,
                     },
+                     attributes:["username", "adminLevel", "createdAt"],
                     include: [{
-                        model: db.images
+                        model: db.image,
+                        attributes:{
+                            exclude:["id"]
+                        }
                     }]
                 }).then(function(userInfo){
                     if(!userInfo){
                         res.status(404);
-                        res.send("No user found with that username.");
+                        res.send();
                     }
-                    else{
-                        
+                    else{  
                         
                     res.status(200).send(userInfo);
                         
@@ -643,7 +663,34 @@ app.get("/api/user/:username", checkForSession, function (req, res) {
                 })
 
             } else {
-
+                    
+                db.user.findOne({
+                    where:{username: req.params.username},
+                    attributes:["username", "adminLevel", "createdAt"],
+                    include:[{
+                        model:db.image,
+                        where:{
+                            privacy:"Public"
+                        }, 
+                        attributes:{
+                            exclude:["id"]
+                        } 
+                             }]
+                                
+                                }).then(function(publicInfo){
+                    
+                                if(!publicInfo){
+                                    res.status(404);
+                                    res.send();
+                                    
+                                }
+                                else{
+                                    res.status(200).send(publicInfo);
+                                    
+                                    
+                                }
+                    
+                })
                 //send only Public Albums and Public Images.
 
 
@@ -658,7 +705,6 @@ app.get("/api/user/:username", checkForSession, function (req, res) {
     })
     //This api call will submit both positive and negative votes. It will not take an integer, it will take a boolean. This avoids issues with people sending integers and stuff.
 app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
-    console.log(req.body.vote);
     if (req.body.vote === true) {
         req.body.vote = 1
     } else if (req.body.vote === false) {
@@ -666,7 +712,7 @@ app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
     } else if (req.body.vote === null) {
         req.body.vote = 0
     } else {
-        res.status(400).send("Bad Request : You know what you did.");
+        res.status(400).send({servermsg:"Bad Request : You know what you did."});
     }
 
 
@@ -677,7 +723,7 @@ app.post("/api/submitvote/:key", authenticateUser, function (req, res) {
         }).then(function (image) {
             if (!image) {
                 res.status(400);
-                res.send("Bad Request : No such image.");
+                res.send({servermsg:"Bad Request : No such image."});
                 return;
             } else {
                 req.image = image;
